@@ -1,0 +1,27 @@
+[package]
+name = "constants"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "constants"
+
+# [build]
+# rustflags = ["--cfg=no_custom_heap"]
+
+[features]
+no-entrypoint = []
+custom-heap = [] 
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+# anchor-lang = "0.29.0"
+anchor-lang = {version = "0.30.1", features = ["init-if-needed"]}
+anchor-spl = "0.30.1"
+solana-program = "1.16.24"
