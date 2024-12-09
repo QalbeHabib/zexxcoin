@@ -7,7 +7,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("9WtGjBWToPPyw1Gd1iP92ou71YDkX2ayboP87JoUcn6V");
+declare_id!("4NiRZQQ5Rgsoy2zZ7SWAJAvbCuimUH1nY1nwCFKnfPtz");
 
 #[program]
 pub mod terminus_presale {

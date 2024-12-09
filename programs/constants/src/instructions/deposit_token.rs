@@ -73,16 +73,14 @@ pub struct DepositToken<'info> {
 pub fn deposit_token(ctx: Context<DepositToken>, amount: u64) -> Result<()> {
     let presale_info = &mut ctx.accounts.presale_info;
 
-    // transfer token to the presaleAta
-    msg!(
-        "Mint: {}",
-        &ctx.accounts.mint_account.to_account_info().key()
-    );
-    msg!("From Token Address: {}", &ctx.accounts.token_account.key());
-    msg!(
-        "To Token Address: {}",
-        &ctx.accounts.to_associated_token_account.key()
-    );
+    // Detailed logging for debugging
+    msg!("Deposit Amount: {}", amount);
+    msg!("Mint Address: {}", &ctx.accounts.mint_account.key());
+    msg!("From Token Account: {}", &ctx.accounts.token_account.key());
+    msg!("From Token Account Balance: {}", &ctx.accounts.token_account.amount);
+    msg!("To Token Address: {}", &ctx.accounts.to_associated_token_account.key());
+    msg!("Rent Minimum Transfer Amount: {}", RENT_MINIMUM);
+
     token::transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -114,7 +112,7 @@ pub fn deposit_token(ctx: Context<DepositToken>, amount: u64) -> Result<()> {
 
     presale_info.deposit_token_amount = presale_info.deposit_token_amount + amount;
 
-    msg!("Tokens deposited successfully.");
+    msg!("Tokens deposited successfully. Total deposited: {}", presale_info.deposit_token_amount);
 
     Ok(())
 }
