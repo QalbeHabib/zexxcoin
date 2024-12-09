@@ -81,7 +81,7 @@ pub fn buy_token(ctx: Context<BuyToken>, quote_amount: u64) -> Result<()> {
     }
 
     let token_amount: u64 = quote_amount / presale_info.price_per_token;
-    // let token_amount_with_decimals = token_amount * 1_000_000_000;
+    let token_amount_with_decimals = token_amount * 1_000_000_000;
 
     // compare the rest with the token_amount
     if token_amount > presale_info.deposit_token_amount - presale_info.sold_token_amount {
@@ -114,10 +114,10 @@ pub fn buy_token(ctx: Context<BuyToken>, quote_amount: u64) -> Result<()> {
     // send SOL to contract and update the user info
     user_info.buy_time = cur_timestamp;
     user_info.buy_quote_amount = user_info.buy_quote_amount + quote_amount;
-    user_info.buy_token_amount = user_info.buy_token_amount + token_amount;
+    user_info.buy_token_amount = user_info.buy_token_amount + token_amount_with_decimals;
 
     // Update presale info with decimals
-    presale_info.sold_token_amount = presale_info.sold_token_amount + token_amount;
+    presale_info.sold_token_amount = presale_info.sold_token_amount + token_amount_with_decimals;
 
     system_program::transfer(
         CpiContext::new(
