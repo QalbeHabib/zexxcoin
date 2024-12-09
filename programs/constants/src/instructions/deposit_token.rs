@@ -1,11 +1,8 @@
 use anchor_lang::system_program;
 // use solana_program::program::invoke;
 
-use {
-    anchor_lang::prelude::*,
-    anchor_spl::token,
-};
 use anchor_spl::token::Token;
+use {anchor_lang::prelude::*, anchor_spl::token};
 // use solana_program::rent::Rent;
 use anchor_spl::associated_token::AssociatedToken;
 use crate::constants::RENT_MINIMUM;
@@ -77,8 +74,14 @@ pub fn deposit_token(ctx: Context<DepositToken>, amount: u64) -> Result<()> {
     msg!("Deposit Amount: {}", amount);
     msg!("Mint Address: {}", &ctx.accounts.mint_account.key());
     msg!("From Token Account: {}", &ctx.accounts.token_account.key());
-    msg!("From Token Account Balance: {}", &ctx.accounts.token_account.amount);
-    msg!("To Token Address: {}", &ctx.accounts.to_associated_token_account.key());
+    msg!(
+        "From Token Account Balance: {}",
+        &ctx.accounts.token_account.amount
+    );
+    msg!(
+        "To Token Address: {}",
+        &ctx.accounts.to_associated_token_account.key()
+    );
     msg!("Rent Minimum Transfer Amount: {}", RENT_MINIMUM);
 
     token::transfer(
@@ -112,7 +115,10 @@ pub fn deposit_token(ctx: Context<DepositToken>, amount: u64) -> Result<()> {
 
     presale_info.deposit_token_amount = presale_info.deposit_token_amount + amount;
 
-    msg!("Tokens deposited successfully. Total deposited: {}", presale_info.deposit_token_amount);
+    msg!(
+        "Tokens deposited successfully. Total deposited: {}",
+        presale_info.deposit_token_amount
+    );
 
     Ok(())
 }

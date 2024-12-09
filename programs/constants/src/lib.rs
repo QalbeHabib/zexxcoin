@@ -43,7 +43,6 @@ pub mod terminus_presale {
         hardcap_amount: u64,
         start_time: u64,
         end_time: u64,
-
     ) -> Result<()> {
         return update_presale::update_presale(
             ctx,
@@ -53,7 +52,6 @@ pub mod terminus_presale {
             hardcap_amount,
             start_time,
             end_time,
-
         );
     }
 
@@ -73,7 +71,7 @@ pub mod terminus_presale {
         return claim_token::claim_token(ctx, bump);
     }
 
-    pub fn withdraw_sol(ctx: Context<WithdrawSol>,  bump: u8) -> Result<()> {
+    pub fn withdraw_sol(ctx: Context<WithdrawSol>, bump: u8) -> Result<()> {
         return withdraw_sol::withdraw_sol(ctx, bump);
     }
 
@@ -81,4 +79,3 @@ pub mod terminus_presale {
         return withdraw_token::withdraw_token(ctx, amount, bump);
     }
 }
-
