@@ -35,8 +35,8 @@ pub fn withdraw_sol(ctx: Context<WithdrawSol>, bump: u8) -> Result<()> {
     let vault_balance = ctx.accounts.presale_vault.to_account_info().lamports();
     msg!("Vault balance: {} lamports", vault_balance);
 
-    // Check if there's any balance to withdraw
-    require!(vault_balance == 0, PresaleError::EmptyVault);
+    // Check if there's NO balance to withdraw
+    require!(vault_balance > 0, PresaleError::EmptyVault);
 
     // Transfer all SOL from the vault to the admin
     system_program::transfer(
@@ -46,7 +46,7 @@ pub fn withdraw_sol(ctx: Context<WithdrawSol>, bump: u8) -> Result<()> {
                 from: ctx.accounts.presale_vault.to_account_info(),
                 to: ctx.accounts.admin.to_account_info(),
             },
-            &[&[b"vault", &[bump]]], // PDA signer
+            &[&[b"vault", &[bump]]],
         ),
         vault_balance,
     )?;
