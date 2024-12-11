@@ -1,36 +1,231 @@
-## SOLANA SPL TOKEN PRESALE PROGRAM
+# Solana SPL Token Presale Program
 
-This contract, written using the Anchor framework on Solana is a token presale. Here's what it does:
+A comprehensive Solana program for managing token presales, built with the Anchor framework. This program enables projects to conduct token presales with configurable parameters, security features, and automated distribution.
 
-1. **create_presale**: This function sets up the parameters for a presale, such as:
+## Features
 
-   - **token_mint_address**: The token being sold.
-   - **softcap_amount**: The minimum amount of funds to be raised for the presale to succeed.
-   - **hardcap_amount**: The maximum amount of funds the presale can raise.
-   - **max_token_amount_per_address**: Limit on how many tokens an individual can purchase.
-   - **price_per_token**: The price per token.
-   - **start_time** and **end_time**: Time window for the presale.
+### Core Functionality
 
-2. **update_presale**: This function allows updating presale parameters, such as the token price or time limits, if needed.
+1. **Presale Creation & Management**
 
-3. **deposit_token**: This likely allows the presale manager or owner to deposit the tokens that will be sold during the presale.
+   - Set token mint address
+   - Configure soft and hard caps
+   - Set per-wallet purchase limits
+   - Define token price
+   - Set presale duration (start/end times)
 
-4. **start_presale**: Initiates the presale by setting the start and end times.
+2. **Token Operations**
 
-5. **buy_token**: Enables users to purchase tokens using a "quote token" (often SOL or another stable token) by specifying the amount of tokens they want to buy and the corresponding payment.
+   - Deposit presale tokens
+   - Purchase tokens with SOL
+   - Claim purchased tokens
+   - Withdraw collected SOL (admin)
+   - Withdraw unsold tokens (admin)
 
-6. **claim_token**: After the presale is over, buyers can claim their purchased tokens.
+3. **Security Features**
+   - Authority-based access control
+   - Time-based restrictions
+   - Purchase amount validations
+   - Soft/hard cap enforcement
 
-7. **withdraw_sol**: The contract owner can withdraw the SOL (or other quote tokens) collected during the presale after it ends.
+### Program Instructions
 
-8. **withdraw_token**: If the presale is unsuccessful or canceled, the owner may be able to withdraw the tokens that were not sold.
+1. `create_presale`
 
-### Real-World Use Case:
+   - Initialize presale with parameters
+   - Set token mint, caps, limits, and timing
 
-This kind of contract would be used in **token fundraising**. Projects can launch presales to secure early capital and reward early supporters by offering them the project’s tokens at discounted rates. Real-world scenarios might include:
+   ```rust
+   pub fn create_presale(
+       token_mint_address: Pubkey,
+       softcap_amount: u64,
+       hardcap_amount: u64,
+       max_token_amount_per_address: u64,
+       price_per_token: u64,
+       start_time: u64,
+       end_time: u64,
+   )
+   ```
 
-- **Blockchain startups** raising funds to develop their platform.
-- **NFT platforms** releasing tokens to attract early users.
-- **Gaming or DeFi projects** issuing governance or utility tokens pre-launch.
+2. `update_presale`
 
-This contract helps manage the sale of these tokens, ensuring limits, security, and proper fund collection during the process.
+   - Modify presale parameters
+   - Update timing, limits, and pricing
+
+   ```rust
+   pub fn update_presale(
+       max_token_amount_per_address: u64,
+       price_per_token: u64,
+       softcap_amount: u64,
+       hardcap_amount: u64,
+       start_time: u64,
+       end_time: u64,
+   )
+   ```
+
+3. `deposit_token`
+
+   - Deposit tokens for sale
+
+   ```rust
+   pub fn deposit_token(amount: u64)
+   ```
+
+4. `buy_token`
+
+   - Purchase tokens with SOL
+
+   ```rust
+   pub fn buy_token(quote_amount: u64)
+   ```
+
+5. `claim_token`
+
+   - Claim purchased tokens after presale
+
+   ```rust
+   pub fn claim_token(bump: u8)
+   ```
+
+6. `withdraw_sol`
+
+   - Withdraw collected SOL (admin only)
+
+   ```rust
+   pub fn withdraw_sol(bump: u8)
+   ```
+
+7. `withdraw_token`
+   - Withdraw unsold tokens (admin only)
+   ```rust
+   pub fn withdraw_token(amount: u64, bump: u8)
+   ```
+
+## Program Architecture
+
+### Account Structure
+
+1. **PresaleInfo**: Stores presale configuration and state
+
+   - Token mint address
+   - Caps and limits
+   - Timing parameters
+   - Collection status
+
+2. **UserInfo**: Tracks individual user participation
+   - Purchase amounts
+   - Claim status
+   - Timestamps
+
+### Security Considerations
+
+- Authority validation for admin operations
+- PDA-based account derivation
+- Time-based access control
+- Amount validation checks
+
+## Development Setup
+
+1. **Prerequisites**
+
+   ```bash
+   # Install Rust
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+   # Install Solana CLI
+   sh -c "$(curl -sSfL https://release.solana.com/v1.17.0/install)"
+
+   # Install Anchor CLI
+   cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+   ```
+
+2. **Build**
+
+   ```bash
+   # Build the program
+   anchor build
+
+   # Run tests
+   anchor test
+   ```
+
+3. **Deploy**
+
+   ```bash
+   # Deploy to devnet
+   anchor deploy --provider.cluster devnet
+
+   # Deploy to mainnet
+   anchor deploy --provider.cluster mainnet-beta
+   ```
+
+## Testing
+
+```bash
+# Run all tests
+anchor test
+
+# Run specific test
+anchor test test_create_presale
+```
+
+## Integration Guide
+
+1. **Initialize Presale**
+
+   ```typescript
+   const presaleParams = {
+     tokenMintAddress: new PublicKey("..."),
+     softcapAmount: new BN("1000000000"),
+     hardcapAmount: new BN("5000000000"),
+     maxTokenAmountPerAddress: new BN("1000000000"),
+     pricePerToken: new BN("1000000"),
+     startTime: new BN(Math.floor(Date.now() / 1000) + 3600),
+     endTime: new BN(Math.floor(Date.now() / 1000) + 86400),
+   };
+   ```
+
+2. **User Participation**
+
+   ```typescript
+   // Buy tokens
+   await program.methods
+       .buyToken(new BN("1000000000"))
+       .accounts({...})
+       .rpc();
+
+   // Claim tokens
+   await program.methods
+       .claimToken(bump)
+       .accounts({...})
+       .rpc();
+   ```
+
+## Security Recommendations
+
+1. **For Administrators**
+
+   - Thoroughly test on devnet
+   - Verify all parameters before mainnet deployment
+   - Secure authority keypair
+   - Monitor transactions during presale
+
+2. **For Users**
+   - Verify program address
+   - Check token mint address
+   - Confirm presale parameters
+   - Use official UI/interface
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+For detailed token creation instructions, see [TOKEN_CREATION.md](./TOKEN_CREATION.md)

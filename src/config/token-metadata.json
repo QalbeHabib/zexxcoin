@@ -1,0 +1,21 @@
+{
+    "name": "Your Token Name",
+    "symbol": "SYMBOL",
+    "description": "Your token description goes here",
+    "image": "https://your-token-image-uri.png",
+    "external_url": "https://your-website.com",
+    "attributes": [
+        {
+            "trait_type": "Category",
+            "value": "Token"
+        }
+    ],
+    "properties": {
+        "files": [
+            {
+                "uri": "https://your-token-image-uri.png",
+                "type": "image/png"
+            }
+        ]
+    }
+}
