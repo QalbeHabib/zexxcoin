@@ -49,6 +49,7 @@ async function createTokenWithMetadata() {
     console.log("Minting initial supply...");
     const initialSupplyWithDecimals =
       TOKEN_CONFIG.initialSupply * 10 ** TOKEN_CONFIG.decimals;
+    // 1_000_000_000 * 10^9  = 1,000,000,000,000,000,000,000 = 1 billion tokens
     await mintTo(
       connection,
       payer,

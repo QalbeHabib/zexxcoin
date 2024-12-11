@@ -126,6 +126,45 @@ yarn create-token
 }
 ```
 
+## Advanced Configuration Options
+
+### 1. Freeze Authority
+
+```typescript
+// During token creation, you can set freeze authority
+const mint = await createMint(
+  connection,
+  payer,
+  payer.publicKey, // Mint Authority
+  payer.publicKey, // Freeze Authority (set to null to disable)
+  decimals
+);
+```
+
+### 2. Metadata Mutability
+
+The `isMutable` flag determines if token metadata can be updated after creation:
+
+```typescript
+{
+    createMetadataAccountArgsV3: {
+        data: {
+            // ... metadata fields
+        },
+        isMutable: true,  // Set to false to make metadata permanent
+        collectionDetails: null,
+    }
+}
+```
+
+### 3. Token Standards
+
+This implementation uses:
+
+- SPL Token Program for token creation
+- Metaplex Token Metadata Program for metadata
+- Arweave for permanent storage
+
 ## Cost Breakdown
 
 1. **Token Creation**
@@ -193,6 +232,66 @@ yarn create-token
    - Invalid image format
    - Network timeouts
    - Invalid metadata format
+
+## Error Handling
+
+### Common Errors and Solutions
+
+1. **Transaction Simulation Failed**
+
+   ```bash
+   Error: Transaction simulation failed: Error processing Instruction 0: custom program error: 0x1
+   ```
+
+   Solution: Check SOL balance and account permissions
+
+2. **Metadata Account Already Exists**
+
+   ```bash
+   Error: Account already exists
+   ```
+
+   Solution: Use a new mint address or update existing metadata
+
+3. **Invalid Owner**
+
+   ```bash
+   Error: Invalid program owner
+   ```
+
+   Solution: Ensure correct program IDs are used
+
+4. **Arweave Upload Failures**
+   ```bash
+   Error: Failed to upload to Arweave
+   ```
+   Solutions:
+   - Check SOL balance (needed for upload fees)
+   - Verify file size and format
+   - Check network connectivity
+   - Try alternative Bundlr nodes
+
+### Prevention Tips
+
+1. **Before Token Creation**
+
+   - Verify all configuration parameters
+   - Ensure sufficient SOL balance
+   - Test metadata URI accessibility
+   - Validate image formats and sizes
+
+2. **During Token Creation**
+
+   - Monitor transaction status
+   - Keep track of all generated addresses
+   - Verify account creations
+   - Check token supply calculations
+
+3. **After Token Creation**
+   - Verify metadata account
+   - Check token account balances
+   - Test token transfers
+   - Validate metadata URI resolution
 
 ## Integration with Presale
 
