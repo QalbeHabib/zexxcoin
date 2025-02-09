@@ -64,19 +64,23 @@ pub struct ClaimToken<'info> {
 
 pub fn claim_token(ctx: Context<ClaimToken>, bump: u8) -> Result<()> {
     let presale_info = &mut ctx.accounts.presale_info;
-    let cur_timestamp = u64::try_from(Clock::get()?.unix_timestamp).unwrap();
-    let end_time = presale_info.end_time;
-
+    let current_time = Clock::get()?.unix_timestamp;
+    let end_time = presale_info.end_time as u64;
     // Check if presale has ended
-    if cur_timestamp < end_time {
-        msg!("current time: {}", cur_timestamp);
+    if (current_time as u64) < end_time {
+        msg!("current time: {}", current_time);
         msg!("presale end time: {}", end_time);
         msg!("Presale not ended yet.");
         return Err(PresaleError::PresaleNotEnded.into());
     }
 
     let user_info = &mut ctx.accounts.user_info;
-    let claim_amount = user_info.buy_token_amount;
+    let claim_amount = user_info.tokens_bought;
+    let is_claimed = user_info.has_claimed;
+    if is_claimed {
+        msg!("User has already claimed the tokens.");
+        return Err(PresaleError::UserAlreadyClaimed.into());
+    }
 
     msg!(
         "Transferring presale tokens to buyer {}...",
@@ -108,10 +112,11 @@ pub fn claim_token(ctx: Context<ClaimToken>, bump: u8) -> Result<()> {
         claim_amount,
     )?;
 
-    user_info.buy_token_amount = 0;
-    user_info.claim_time = cur_timestamp;
+    user_info.tokens_bought = 0;
+    user_info.last_purchase_time = current_time;
+    user_info.has_claimed = true;
     msg!("All claimed presale tokens transferred successfully. here");
-    msg!("current time: {}", cur_timestamp);
+    msg!("current time: {}", current_time);
     msg!("presale end time: {}", end_time);
 
     Ok(())

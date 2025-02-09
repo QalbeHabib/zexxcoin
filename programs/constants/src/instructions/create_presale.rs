@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::errors::PresaleError;
-use crate::state::PresaleInfo;
+use crate::state::{PresaleInfo, Phase};
 
 #[derive(Accounts)]
 pub struct CreatePresale<'info> {
@@ -27,42 +27,98 @@ pub struct CreatePresale<'info> {
 pub fn create_presale(
     ctx: Context<CreatePresale>,
     token_mint_address: Pubkey,
-    softcap_amount: u64,
-    hardcap_amount: u64,
+    start_time: i64,
+    end_time: i64,
     max_token_amount_per_address: u64,
-    price_per_token: u64,
-    start_time: u64,
-    end_time: u64,
 ) -> Result<()> {
-    require!(price_per_token > 0, PresaleError::InvalidPrice);
-    require!(softcap_amount > 0, PresaleError::InvalidSoftcap);
-    require!(
-        hardcap_amount >= softcap_amount,
-        PresaleError::InvalidHardcap
-    );
     require!(start_time < end_time, PresaleError::InvalidTimeRange);
+    require!(max_token_amount_per_address > 0, PresaleError::InvalidAmount);
+
     let presale_info = &mut ctx.accounts.presale_info;
     let authority = &ctx.accounts.authority;
 
+    // Initialize phases with predefined values
+    let phases = [
+        Phase {
+            phase_number: 1,
+            amount: 2_500_000,        // 5% of 50M
+            price: 199_990_000,       // 0.19999 SOL in lamports
+            percentage: 5,
+            tokens_sold: 0,
+            tokens_available: 2_500_000, // Same as amount initially
+            is_active: true,          // First phase starts active
+            start_time,               // First phase starts with presale
+            end_time: start_time + (end_time - start_time) / 5, // Divide total time into 5 parts
+        },
+        Phase {
+            phase_number: 2,
+            amount: 5_000_000,        // 10% of 50M
+            price: 399_990_000,       // 0.39999 SOL in lamports
+            percentage: 10,
+            tokens_sold: 0,
+            tokens_available: 5_000_000, // Same as amount initially
+            is_active: false,
+            start_time: start_time + (end_time - start_time) / 5,
+            end_time: start_time + 2 * (end_time - start_time) / 5,
+        },
+        Phase {
+            phase_number: 3,
+            amount: 17_500_000,       // 35% of 50M
+            price: 499_990_000,       // 0.49999 SOL in lamports
+            percentage: 35,
+            tokens_sold: 0,
+            tokens_available: 17_500_000, // Same as amount initially
+            is_active: false,
+            start_time: start_time + 2 * (end_time - start_time) / 5,
+            end_time: start_time + 3 * (end_time - start_time) / 5,
+        },
+        Phase {
+            phase_number: 4,
+            amount: 20_000_000,       // 40% of 50M
+            price: 599_990_000,       // 0.59999 SOL in lamports
+            percentage: 40,
+            tokens_sold: 0,
+            tokens_available: 20_000_000, // Same as amount initially
+            is_active: false,
+            start_time: start_time + 3 * (end_time - start_time) / 5,
+            end_time: start_time + 4 * (end_time - start_time) / 5,
+        },
+        Phase {
+            phase_number: 5,
+            amount: 5_000_000,        // 10% of 50M
+            price: 699_990_000,       // 0.69999 SOL in lamports
+            percentage: 10,
+            tokens_sold: 0,
+            tokens_available: 5_000_000, // Same as amount initially
+            is_active: false,
+            start_time: start_time + 4 * (end_time - start_time) / 5,
+            end_time,
+        },
+    ];
+
+    // Initialize presale info
     presale_info.token_mint_address = token_mint_address;
-    presale_info.softcap_amount = softcap_amount;
-    presale_info.hardcap_amount = hardcap_amount;
-    presale_info.deposit_token_amount = 0;
-    presale_info.sold_token_amount = 0;
+    presale_info.total_token_supply = PresaleInfo::TOTAL_SUPPLY;
+    presale_info.remaining_tokens = PresaleInfo::TOTAL_SUPPLY;
+    presale_info.current_phase = 1;
+    presale_info.phases = phases;
+    presale_info.total_tokens_sold = 0;
     presale_info.start_time = start_time;
     presale_info.end_time = end_time;
     presale_info.max_token_amount_per_address = max_token_amount_per_address;
-    presale_info.price_per_token = price_per_token;
-    presale_info.is_live = false;
     presale_info.authority = authority.key();
-    presale_info.is_soft_capped = false;
-    presale_info.is_hard_capped = false;
- 
+    presale_info.is_initialized = true;
+    presale_info.is_active = true;
+    presale_info.is_ended = false;
 
-    msg!(
-        "Presale has created for token: {}",
-        presale_info.token_mint_address
+    // Validate phase allocation
+    require!(
+        presale_info.validate_phase_allocation(),
+        PresaleError::InvalidPhaseAllocation
     );
+
+    msg!("Presale initialized for token: {}", presale_info.token_mint_address);
+    msg!("Starting with Phase 1: {} tokens @ {} lamports", phases[0].amount, phases[0].price);
 
     Ok(())
 }

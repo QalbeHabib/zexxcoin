@@ -113,11 +113,12 @@ pub fn deposit_token(ctx: Context<DepositToken>, amount: u64) -> Result<()> {
         RENT_MINIMUM,
     )?;
 
-    presale_info.deposit_token_amount = presale_info.deposit_token_amount + amount;
+    // Use the deposit_tokens method from PresaleInfo
+    presale_info.deposit_tokens(amount)?;
 
     msg!(
         "Tokens deposited successfully. Total deposited: {}",
-        presale_info.deposit_token_amount
+        presale_info.total_tokens_deposited
     );
 
     Ok(())
