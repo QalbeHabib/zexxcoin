@@ -8,8 +8,9 @@ dotenv.config();
 
 // Program and Token Constants
 export const PROGRAM_ID = new anchor.web3.PublicKey(
-  "4NiRZQQ5Rgsoy2zZ7SWAJAvbCuimUH1nY1nwCFKnfPtz"
+  "EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU"
 );
+
 export const TOKEN_MINT = new anchor.web3.PublicKey(
   "Ah1hf7NZgBhgnhFsrXLoj7czMMiVwUaCHnc5bP9wB6Ge"
 );
@@ -30,3 +31,11 @@ if (!buyerPrivateKey) {
 export const buyerKeypair = anchor.web3.Keypair.fromSecretKey(
   bs58.decode(buyerPrivateKey)
 );
+
+console.log({
+  adminKeypair: authorityKeypair.publicKey.toBase58(),
+  buyerKeypair: buyerKeypair.publicKey.toBase58(),
+  authorityKeypair: authorityKeypair.secretKey,
+  TOKEN_MINT: TOKEN_MINT.toBase58(),
+  PROGRAM_ID: PROGRAM_ID.toBase58(),
+});

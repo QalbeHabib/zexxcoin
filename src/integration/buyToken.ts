@@ -33,6 +33,13 @@ export const buyToken = async (amount: anchor.BN) => {
       true
     );
 
+    console.log({
+      presaleAddress,
+      presaleVault,
+      userInfoAddress,
+      buyerTokenAccount,
+      presaleTokenAccount,
+    });
     const tx = await program.methods
       .buyToken(amount)
       .accounts({

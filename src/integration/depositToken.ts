@@ -8,7 +8,13 @@ import * as anchor from "@coral-xyz/anchor";
 import { program, connection } from "../config/integrationConnection";
 import { authorityKeypair, TOKEN_MINT } from "../constants";
 import { derivePresaleAddress, derivePresaleVaultAddress } from "../utils/pda";
-import { solToLamports } from "../utils/helpers";
+
+// Helper function to convert SOL to lamports with proper BN handling
+const solToLamports = (amount: number): anchor.BN => {
+  // Convert to string first to handle large numbers safely
+  const lamports = (amount * Math.pow(10, 9)).toString();
+  return new anchor.BN(lamports);
+};
 
 export const depositToken = async (amount: anchor.BN) => {
   try {
@@ -39,19 +45,19 @@ export const depositToken = async (amount: anchor.BN) => {
     const tx = await program.methods
       .depositToken(amount)
       .accounts({
-        mintAccount: TOKEN_MINT, // Token mint
+        mintAccount: TOKEN_MINT,
         // @ts-ignore
-        tokenAccount: adminTokenAccount, // Admin token account
-        admin: authorityKeypair.publicKey, // Admin
-        toAssociatedTokenAccount: presaleTokenAccount, // Presale token account
-        presaleVault, // Presale vault
-        presaleInfo: presaleAddress, // Presale info
+        tokenAccount: adminTokenAccount,
+        admin: authorityKeypair.publicKey,
+        toAssociatedTokenAccount: presaleTokenAccount,
+        presaleVault,
+        presaleInfo: presaleAddress,
 
         // system programs arguments
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY, // Rent
-        systemProgram: SystemProgram.programId, // System program
-        tokenProgram: TOKEN_PROGRAM_ID, // Token program
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID, // Associated token program
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
       })
       .signers([authorityKeypair])
       .rpc();
@@ -66,6 +72,7 @@ export const depositToken = async (amount: anchor.BN) => {
 
 // Execute if running directly
 if (require.main === module) {
-  const depositAmount = solToLamports(10);
+  // Use the updated solToLamports function with a smaller test amount first
+  const depositAmount = solToLamports(0); // Testing with 1000 tokens first
   depositToken(depositAmount).catch(console.error);
 }

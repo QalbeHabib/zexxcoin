@@ -8,10 +8,9 @@ import { authorityKeypair, TOKEN_MINT } from "../constants";
 export const createPresale = async () => {
   const { presaleAddress } = await derivePresaleAddress();
 
-  const maxTokenAmountPerAddress = solToLamports(0.1);
+  const maxTokenAmountPerAddress = solToLamports(0.5);
   const startTime = new anchor.BN(Math.floor(Date.now() / 1000));
   const endTime = new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 5); // 5 days
-
   try {
     const tx = await program.methods
       .createPresale(TOKEN_MINT, startTime, endTime, maxTokenAmountPerAddress)

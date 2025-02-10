@@ -1,231 +1,200 @@
-# Solana SPL Token Presale Program
+# Terminus Presale Program
 
-A comprehensive Solana program for managing token presales, built with the Anchor framework. This program enables projects to conduct token presales with configurable parameters, security features, and automated distribution.
+A Solana-based presale program that implements a phased token sale system with increasing prices per phase. This program allows for a controlled distribution of tokens through multiple phases with different allocations and pricing.
+
+## Overview
+
+The Terminus Presale Program is designed to facilitate a token presale with the following features:
+
+- 5 distinct presale phases with different token allocations and prices
+- Total supply of 50,000,000 tokens
+- Automated phase transitions
+- Token claiming system
+- Admin controls for token deposits and SOL withdrawals
+
+## Presale Phases
+
+The presale is divided into 5 phases with the following allocations:
+
+| Phase | Allocation | Percentage | Price (SOL) | Tokens Available |
+| ----- | ---------- | ---------- | ----------- | ---------------- |
+| 1     | 2,500,000  | 5%         | 0.19999     | 2,500,000        |
+| 2     | 5,000,000  | 10%        | 0.39999     | 5,000,000        |
+| 3     | 17,500,000 | 35%        | 0.49999     | 17,500,000       |
+| 4     | 20,000,000 | 40%        | 0.59999     | 20,000,000       |
+| 5     | 5,000,000  | 10%        | 0.69999     | 5,000,000        |
 
 ## Features
 
-### Core Functionality
+- **Phase Management**: Automatic transition between phases based on time and token sales
+- **Price Tiers**: Increasing price tiers across phases
+- **Purchase Limits**: Configurable maximum token purchase limit per address
+- **Token Deposits**: Admin can deposit tokens to be distributed during the presale
+- **Token Claims**: Users can claim their purchased tokens after the presale ends
+- **SOL Withdrawal**: Admin can withdraw collected SOL from sales
 
-1. **Presale Creation & Management**
+## Getting Started
 
-   - Set token mint address
-   - Configure soft and hard caps
-   - Set per-wallet purchase limits
-   - Define token price
-   - Set presale duration (start/end times)
+### Prerequisites
 
-2. **Token Operations**
+- Node.js v14+ and npm
+- Rust and Cargo
+- Solana Tool Suite
+- Anchor Framework
 
-   - Deposit presale tokens
-   - Purchase tokens with SOL
-   - Claim purchased tokens
-   - Withdraw collected SOL (admin)
-   - Withdraw unsold tokens (admin)
+### Installation
 
-3. **Security Features**
-   - Authority-based access control
-   - Time-based restrictions
-   - Purchase amount validations
-   - Soft/hard cap enforcement
+1. Clone the repository:
 
-### Program Instructions
+```bash
+git clone https://github.com/yourusername/terminus-presale.git
+cd terminus-presale
+```
 
-1. `create_presale`
+2. Install dependencies:
 
-   - Initialize presale with parameters
-   - Set token mint, caps, limits, and timing
+```bash
+npm install
+```
 
-   ```rust
-   pub fn create_presale(
-       token_mint_address: Pubkey,
-       softcap_amount: u64,
-       hardcap_amount: u64,
-       max_token_amount_per_address: u64,
-       price_per_token: u64,
-       start_time: u64,
-       end_time: u64,
-   )
-   ```
+3. Build the program:
 
-2. `update_presale`
+```bash
+anchor build
+```
 
-   - Modify presale parameters
-   - Update timing, limits, and pricing
+### Configuration
 
-   ```rust
-   pub fn update_presale(
-       max_token_amount_per_address: u64,
-       price_per_token: u64,
-       softcap_amount: u64,
-       hardcap_amount: u64,
-       start_time: u64,
-       end_time: u64,
-   )
-   ```
+1. Create a `.env` file with the following variables:
 
-3. `deposit_token`
+```env
+BUYER_PRIVATE_KEY=your_private_key_here
+```
 
-   - Deposit tokens for sale
+2. Update the `keypair.json` file with your admin wallet credentials.
 
-   ```rust
-   pub fn deposit_token(amount: u64)
-   ```
+## Usage
 
-4. `buy_token`
+### Initialize Presale
 
-   - Purchase tokens with SOL
+Create a new presale with specified parameters:
 
-   ```rust
-   pub fn buy_token(quote_amount: u64)
-   ```
+```typescript
+const createPresale = async () => {
+  const maxTokenAmountPerAddress = solToLamports(0.1);
+  const startTime = new anchor.BN(Math.floor(Date.now() / 1000));
+  const endTime = new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 5); // 5 days
 
-5. `claim_token`
+  await program.methods
+    .createPresale(TOKEN_MINT, startTime, endTime, maxTokenAmountPerAddress)
+    .accounts({...})
+    .signers([authorityKeypair])
+    .rpc();
+};
+```
 
-   - Claim purchased tokens after presale
+### Deposit Tokens
 
-   ```rust
-   pub fn claim_token(bump: u8)
-   ```
+Admin can deposit tokens to be distributed during the presale:
 
-6. `withdraw_sol`
+```typescript
+const depositToken = async (amount: anchor.BN) => {
+  await program.methods
+    .depositToken(amount)
+    .accounts({...})
+    .signers([authorityKeypair])
+    .rpc();
+};
+```
 
-   - Withdraw collected SOL (admin only)
+### Buy Tokens
 
-   ```rust
-   pub fn withdraw_sol(bump: u8)
-   ```
+Users can purchase tokens during the active phase:
 
-7. `withdraw_token`
-   - Withdraw unsold tokens (admin only)
-   ```rust
-   pub fn withdraw_token(amount: u64, bump: u8)
-   ```
+```typescript
+const buyToken = async (amount: anchor.BN) => {
+  await program.methods
+    .buyToken(amount)
+    .accounts({...})
+    .signers([buyerKeypair])
+    .rpc();
+};
+```
+
+### Claim Tokens
+
+Users can claim their purchased tokens after the presale ends:
+
+```typescript
+const claimToken = async () => {
+  await program.methods
+    .claimToken(bump)
+    .accounts({...})
+    .signers([buyerKeypair])
+    .rpc();
+};
+```
 
 ## Program Architecture
 
-### Account Structure
+### Key Accounts
 
 1. **PresaleInfo**: Stores presale configuration and state
 
    - Token mint address
-   - Caps and limits
-   - Timing parameters
-   - Collection status
+   - Total supply and remaining tokens
+   - Phase information
+   - Start and end times
+   - Maximum tokens per address
 
 2. **UserInfo**: Tracks individual user participation
-   - Purchase amounts
+
+   - Tokens bought
+   - Phase purchases
    - Claim status
-   - Timestamps
+   - Total amount paid
 
-### Security Considerations
+3. **PresaleVault**: Holds collected SOL from token sales
 
-- Authority validation for admin operations
+### Phase Management
+
+Each phase is defined by:
+
+- Token allocation
+- Price per token
+- Start and end times
+- Active status
+- Tokens sold and available
+
+Phases automatically transition when:
+
+- Current phase's tokens are sold out
+- Current phase's time period ends
+
+## Security Features
+
 - PDA-based account derivation
-- Time-based access control
-- Amount validation checks
+- Authority checks for admin operations
+- Purchase limit enforcement
+- Phase-based price enforcement
+- Token deposit verification
+- Claim verification
 
-## Development Setup
+## Error Handling
 
-1. **Prerequisites**
+The program includes comprehensive error handling for:
 
-   ```bash
-   # Install Rust
-   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+- Invalid time ranges
+- Insufficient funds
+- Phase state violations
+- Purchase limit violations
+- Token availability
+- Claim conditions
 
-   # Install Solana CLI
-   sh -c "$(curl -sSfL https://release.solana.com/v1.17.0/install)"
+## Contributing
 
-   # Install Anchor CLI
-   cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
-   ```
-
-2. **Build**
-
-   ```bash
-   # Build the program
-   anchor build
-
-   # Run tests
-   anchor test
-   ```
-
-3. **Deploy**
-
-   ```bash
-   # Deploy to devnet
-   anchor deploy --provider.cluster devnet
-
-   # Deploy to mainnet
-   anchor deploy --provider.cluster mainnet-beta
-   ```
-
-## Testing
-
-```bash
-# Run all tests
-anchor test
-
-# Run specific test
-anchor test test_create_presale
-```
-
-## Integration Guide
-
-1. **Initialize Presale**
-
-   ```typescript
-   const presaleParams = {
-     tokenMintAddress: new PublicKey("..."),
-     softcapAmount: new BN("1000000000"),
-     hardcapAmount: new BN("5000000000"),
-     maxTokenAmountPerAddress: new BN("1000000000"),
-     pricePerToken: new BN("1000000"),
-     startTime: new BN(Math.floor(Date.now() / 1000) + 3600),
-     endTime: new BN(Math.floor(Date.now() / 1000) + 86400),
-   };
-   ```
-
-2. **User Participation**
-
-   ```typescript
-   // Buy tokens
-   await program.methods
-       .buyToken(new BN("1000000000"))
-       .accounts({...})
-       .rpc();
-
-   // Claim tokens
-   await program.methods
-       .claimToken(bump)
-       .accounts({...})
-       .rpc();
-   ```
-
-## Security Recommendations
-
-1. **For Administrators**
-
-   - Thoroughly test on devnet
-   - Verify all parameters before mainnet deployment
-   - Secure authority keypair
-   - Monitor transactions during presale
-
-2. **For Users**
-   - Verify program address
-   - Check token mint address
-   - Confirm presale parameters
-   - Use official UI/interface
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
-
-For detailed token creation instructions, see [TOKEN_CREATION.md](./TOKEN_CREATION.md)

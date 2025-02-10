@@ -2,6 +2,11 @@
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "build": "anchor build",
+    "create-presale": "ts-node src/integration/createPresale.ts",
+    "deposit-token": "ts-node src/integration/depositToken.ts",
+    "buy-token": "ts-node src/integration/buyToken.ts",
+    "claim-token": "ts-node src/integration/claimToken.ts",
     "create-token": "ts-node src/token-creation/create-token.ts",
     "airdrop": "ts-node src/utils/airdrop.ts",
     "update-token-config": "ts-node src/token-creation/update-token-config.ts",
