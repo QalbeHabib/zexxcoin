@@ -3,7 +3,10 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-constants = "HNuuxwm9Qm3jB238w9UgKmU6KjFdqmDdbVvkTjdBxgm"
+constants = "51EJT9eGMUZnmopLSrhLidTpHnCE7NQcJSJUMUHoZhLV"
+
+[programs.devnet]
+quantcoin_presale = "51EJT9eGMUZnmopLSrhLidTpHnCE7NQcJSJUMUHoZhLV"
 
 [registry]
 url = "https://api.apr.dev"

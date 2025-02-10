@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
 use crate::state::phase_info::Phase;
 use crate::errors::PresaleError;
+use crate::constants::presale_config::TOTAL_SUPPLY;
 
 #[account]
 #[derive(Default)]
 pub struct PresaleInfo {
     // Mint address of the presale token
     pub token_mint_address: Pubkey,
-    // Total token supply for presale (50,000,000)
+    // Total token supply for presale (1,000,000)
     pub total_token_supply: u64,
     // Remaining tokens to be sold across all phases
     pub remaining_tokens: u64,
@@ -37,7 +38,7 @@ pub struct PresaleInfo {
 
 impl PresaleInfo {
     pub const TOTAL_PHASES: usize = 5;
-    pub const TOTAL_SUPPLY: u64 = 50_000_000;
+    pub const TOTAL_SUPPLY: u64 = TOTAL_SUPPLY;
 
     pub fn get_current_phase(&self) -> Option<&Phase> {
         if self.current_phase == 0 || self.current_phase > Self::TOTAL_PHASES as u8 {

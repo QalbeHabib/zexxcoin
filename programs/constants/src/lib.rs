@@ -8,10 +8,10 @@ pub mod state;
 use instructions::*;
 use errors::*;
 
-declare_id!("EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU");
+declare_id!("51EJT9eGMUZnmopLSrhLidTpHnCE7NQcJSJUMUHoZhLV");
 
 #[program]
-pub mod terminus_presale {
+pub mod quantcoin_presale {
     use super::*;
 
     pub fn create_presale(

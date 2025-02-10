@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::errors::PresaleError;
 use crate::state::{PresaleInfo, Phase};
+use crate::constants::presale_config::*;
 
 #[derive(Accounts)]
 pub struct CreatePresale<'info> {
@@ -37,59 +38,59 @@ pub fn create_presale(
     let presale_info = &mut ctx.accounts.presale_info;
     let authority = &ctx.accounts.authority;
 
-    // Initialize phases with predefined values
+    // Initialize phases with predefined values from constants
     let phases = [
         Phase {
             phase_number: 1,
-            amount: 2_500_000,        // 5% of 50M
-            price: 199_990_000,       // 0.19999 SOL in lamports
-            percentage: 5,
+            amount: PHASE_1_ALLOCATION,
+            price: PHASE_1_PRICE,
+            percentage: PHASE_1_PERCENTAGE,
             tokens_sold: 0,
-            tokens_available: 2_500_000, // Same as amount initially
-            is_active: true,          // First phase starts active
-            start_time,               // First phase starts with presale
-            end_time: start_time + (end_time - start_time) / 5, // Divide total time into 5 parts
+            tokens_available: PHASE_1_ALLOCATION,
+            is_active: true,
+            start_time,
+            end_time: start_time + (end_time - start_time) / 5,
         },
         Phase {
             phase_number: 2,
-            amount: 5_000_000,        // 10% of 50M
-            price: 399_990_000,       // 0.39999 SOL in lamports
-            percentage: 10,
+            amount: PHASE_2_ALLOCATION,
+            price: PHASE_2_PRICE,
+            percentage: PHASE_2_PERCENTAGE,
             tokens_sold: 0,
-            tokens_available: 5_000_000, // Same as amount initially
+            tokens_available: PHASE_2_ALLOCATION,
             is_active: false,
             start_time: start_time + (end_time - start_time) / 5,
             end_time: start_time + 2 * (end_time - start_time) / 5,
         },
         Phase {
             phase_number: 3,
-            amount: 17_500_000,       // 35% of 50M
-            price: 499_990_000,       // 0.49999 SOL in lamports
-            percentage: 35,
+            amount: PHASE_3_ALLOCATION,
+            price: PHASE_3_PRICE,
+            percentage: PHASE_3_PERCENTAGE,
             tokens_sold: 0,
-            tokens_available: 17_500_000, // Same as amount initially
+            tokens_available: PHASE_3_ALLOCATION,
             is_active: false,
             start_time: start_time + 2 * (end_time - start_time) / 5,
             end_time: start_time + 3 * (end_time - start_time) / 5,
         },
         Phase {
             phase_number: 4,
-            amount: 20_000_000,       // 40% of 50M
-            price: 599_990_000,       // 0.59999 SOL in lamports
-            percentage: 40,
+            amount: PHASE_4_ALLOCATION,
+            price: PHASE_4_PRICE,
+            percentage: PHASE_4_PERCENTAGE,
             tokens_sold: 0,
-            tokens_available: 20_000_000, // Same as amount initially
+            tokens_available: PHASE_4_ALLOCATION,
             is_active: false,
             start_time: start_time + 3 * (end_time - start_time) / 5,
             end_time: start_time + 4 * (end_time - start_time) / 5,
         },
         Phase {
             phase_number: 5,
-            amount: 5_000_000,        // 10% of 50M
-            price: 699_990_000,       // 0.69999 SOL in lamports
-            percentage: 10,
+            amount: PHASE_5_ALLOCATION,
+            price: PHASE_5_PRICE,
+            percentage: PHASE_5_PERCENTAGE,
             tokens_sold: 0,
-            tokens_available: 5_000_000, // Same as amount initially
+            tokens_available: PHASE_5_ALLOCATION,
             is_active: false,
             start_time: start_time + 4 * (end_time - start_time) / 5,
             end_time,
@@ -98,8 +99,8 @@ pub fn create_presale(
 
     // Initialize presale info
     presale_info.token_mint_address = token_mint_address;
-    presale_info.total_token_supply = PresaleInfo::TOTAL_SUPPLY;
-    presale_info.remaining_tokens = PresaleInfo::TOTAL_SUPPLY;
+    presale_info.total_token_supply = TOTAL_SUPPLY;
+    presale_info.remaining_tokens = TOTAL_SUPPLY;
     presale_info.current_phase = 1;
     presale_info.phases = phases;
     presale_info.total_tokens_sold = 0;

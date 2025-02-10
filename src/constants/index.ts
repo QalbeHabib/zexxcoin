@@ -4,12 +4,18 @@ import * as path from "path";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import dotenv from "dotenv";
 
+import idl from "../../target/idl/quantcoin_presale.json";
+
 dotenv.config();
 
 // Program and Token Constants
-export const PROGRAM_ID = new anchor.web3.PublicKey(
-  "EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU"
-);
+// export const PROGRAM_ID = new anchor.web3.PublicKey(
+//   "8ompjc6TQod7opwxixVJS3WFqDZkKRvscMa7pu1VAgVx"
+// );
+
+const ProgramId = idl.address;
+
+export const PROGRAM_ID = new anchor.web3.PublicKey(ProgramId);
 
 export const TOKEN_MINT = new anchor.web3.PublicKey(
   "Ah1hf7NZgBhgnhFsrXLoj7czMMiVwUaCHnc5bP9wB6Ge"
