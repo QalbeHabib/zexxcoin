@@ -1,10 +1,10 @@
-# Terminus Presale Program
+# QuantCoin Presale Program
 
 A Solana-based presale program that implements a phased token sale system with increasing prices per phase. This program allows for a controlled distribution of tokens through multiple phases with different allocations and pricing.
 
 ## Overview
 
-The Terminus Presale Program is designed to facilitate a token presale with the following features:
+The QuantCoin Presale Program is designed to facilitate a token presale with the following features:
 
 - 5 distinct presale phases with different token allocations and prices
 - Total supply of 50,000,000 tokens
@@ -47,8 +47,8 @@ The presale is divided into 5 phases with the following allocations:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/terminus-presale.git
-cd terminus-presale
+git clone https://github.com/yourusername/QuantCoin-presale.git
+cd QuantCoin-presale
 ```
 
 2. Install dependencies:

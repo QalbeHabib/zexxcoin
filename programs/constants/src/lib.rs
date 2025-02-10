@@ -6,9 +6,8 @@ pub mod instructions;
 pub mod state;
 
 use instructions::*;
-use errors::*;
 
-declare_id!("51EJT9eGMUZnmopLSrhLidTpHnCE7NQcJSJUMUHoZhLV");
+declare_id!("67did8BtXxNui752tb2cDVFGko2qP6As4sLDdjkdCEeG");
 
 #[program]
 pub mod quantcoin_presale {

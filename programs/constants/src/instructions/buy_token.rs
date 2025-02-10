@@ -8,6 +8,7 @@ use solana_program::account_info::AccountInfo;
 
 use crate::errors::PresaleError;
 use crate::state::{PresaleInfo, UserInfo};
+use crate::constants::presale_config::DECIMALS_MULTIPLIER;
 
 #[derive(Accounts)]
 pub struct BuyToken<'info> {
@@ -121,8 +122,12 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     presale_info.remaining_tokens = new_remaining;
     
     // Calculate payment amount in lamports
-    let payment_amount = phase_price.checked_mul(amount)
+    // Convert amount to actual tokens by dividing by DECIMALS_MULTIPLIER
+    let actual_tokens = amount.checked_div(DECIMALS_MULTIPLIER)
         .ok_or(PresaleError::Overflow)?;
+    let payment_amount = phase_price.checked_mul(actual_tokens)
+        .ok_or(PresaleError::Overflow)?;
+
 
     // Transfer SOL from buyer to presale vault
     system_program::transfer(

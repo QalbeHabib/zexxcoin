@@ -3,16 +3,16 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-constants = "51EJT9eGMUZnmopLSrhLidTpHnCE7NQcJSJUMUHoZhLV"
+constants = "E146Yz6pKA6USTSqzHZss27vs7jXoBVU6agdXXU97JQC"
 
 [programs.devnet]
-quantcoin_presale = "51EJT9eGMUZnmopLSrhLidTpHnCE7NQcJSJUMUHoZhLV"
+quantcoin_presale = "E146Yz6pKA6USTSqzHZss27vs7jXoBVU6agdXXU97JQC"
 
 [registry]
-url = "https://api.apr.dev"
+url = "https://api.anchor-api.com"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
