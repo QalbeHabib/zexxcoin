@@ -28,6 +28,8 @@ pub enum PresaleError {
     PhaseNotStarted,
     #[msg("Phase has ended")]
     PhaseEnded,
+    #[msg("Phase not ended yet")]
+    PhaseNotEnded,
     #[msg("Insufficient tokens in current phase")]
     InsufficientTokens,
     #[msg("Exceeds maximum tokens per address")]

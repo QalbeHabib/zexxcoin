@@ -131,7 +131,7 @@ export const buyToken = async (amount: anchor.BN) => {
 
 // Execute if running directly
 if (require.main === module) {
-  const purchaseAmount = new anchor.BN(10000); // Try buying 10000 tokens instead of 100M
+  const purchaseAmount = new anchor.BN(24); // Try buying 10000 tokens instead of 100M
   console.log("Attempting to purchase", purchaseAmount.toString(), "tokens...");
   buyToken(purchaseAmount)
     .then((result) => {
