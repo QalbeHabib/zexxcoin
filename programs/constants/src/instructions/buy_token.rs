@@ -119,7 +119,30 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     // Update presale state
     presale_info.total_tokens_sold = new_total_sold;
     presale_info.remaining_tokens = new_remaining;
+    
+    // Calculate payment amount in lamports
+    let payment_amount = phase_price.checked_mul(amount)
+        .ok_or(PresaleError::Overflow)?;
+
+    // Transfer SOL from buyer to presale vault
+    system_program::transfer(
+        CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            system_program::Transfer {
+                from: ctx.accounts.buyer.to_account_info(),
+                to: ctx.accounts.presale_vault.to_account_info(),
+            }
+        ),
+        payment_amount
+    )?;
+
+    // Update user info with all required fields
     user_info.tokens_bought = new_user_total;
+    user_info.phase_purchases[(phase_number - 1) as usize] = user_info.phase_purchases[(phase_number - 1) as usize].checked_add(amount)
+        .ok_or(PresaleError::Overflow)?;
+    user_info.last_purchase_time = current_time;
+    user_info.total_paid = user_info.total_paid.checked_add(payment_amount)
+        .ok_or(PresaleError::Overflow)?;
     
     // Handle phase completion
     if phase_complete && phase_number < PresaleInfo::TOTAL_PHASES as u8 {
@@ -137,19 +160,9 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
         presale_info.is_active = false;
     }
 
-    // Do token transfer last after all state updates
-    let transfer_ctx = CpiContext::new(
-        ctx.accounts.token_program.to_account_info(),
-        Transfer {
-            from: ctx.accounts.presale_token_account.to_account_info(),
-            to: ctx.accounts.buyer_token_account.to_account_info(),
-            authority: presale_info.to_account_info(),
-        },
-    );
-    token::transfer(transfer_ctx, amount)?;
-
     msg!("Tokens purchased: {} at phase {} price: {} lamports", 
         amount, phase_number, phase_price);
+    msg!("Tokens can be claimed after phase completion");
 
     Ok(())
 }
