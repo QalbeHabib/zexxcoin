@@ -22,7 +22,9 @@ pub struct BuyToken<'info> {
     pub presale_info: Box<Account<'info, PresaleInfo>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = buyer,
+        space = 8 + std::mem::size_of::<UserInfo>(),
         seeds = [
             b"user",
             presale_info.key().as_ref(),
@@ -59,6 +61,16 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     let presale_info = &mut ctx.accounts.presale_info;
     let user_info = &mut ctx.accounts.user_info;
     let current_time = Clock::get()?.unix_timestamp;
+
+    // Initialize user_info if it's new
+    if user_info.wallet == Pubkey::default() {
+        user_info.wallet = ctx.accounts.buyer.key();
+        user_info.tokens_bought = 0;
+        user_info.phase_purchases = [0; 5];
+        user_info.last_purchase_time = 0;
+        user_info.has_claimed = false;
+        user_info.total_paid = 0;
+    }
 
     // Basic validations
     require!(presale_info.is_initialized, PresaleError::PresaleNotInitialized);

@@ -18,8 +18,13 @@ export const derivePresaleVaultAddress = async () => {
 };
 
 export const deriveUserInfoAddress = async (buyer?: PublicKey) => {
+  const { presaleAddress } = await derivePresaleAddress();
   const [userInfoAddress] = PublicKey.findProgramAddressSync(
-    [Buffer.from("user"), (buyer || buyerKeypair.publicKey).toBuffer()],
+    [
+      Buffer.from("user"),
+      presaleAddress.toBuffer(),
+      (buyer || buyerKeypair.publicKey).toBuffer(),
+    ],
     PROGRAM_ID
   );
   return userInfoAddress;

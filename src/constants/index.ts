@@ -35,7 +35,7 @@ export const buyerKeypair = anchor.web3.Keypair.fromSecretKey(
 console.log({
   adminKeypair: authorityKeypair.publicKey.toBase58(),
   buyerKeypair: buyerKeypair.publicKey.toBase58(),
-  authorityKeypair: authorityKeypair.secretKey,
+  // authorityKeypair: authorityKeypair.secretKey,
   TOKEN_MINT: TOKEN_MINT.toBase58(),
   PROGRAM_ID: PROGRAM_ID.toBase58(),
 });
