@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
-import type { QuantcoinPresale } from "../../target/types/quantcoin_presale";
-import idl from "../../target/idl/quantcoin_presale.json";
+import type { ZexxcoinPresale } from "../../target/types/zexxcoin_presale";
+import idl from "../../target/idl/zexxcoin_presale.json";
 import { authorityKeypair, PROGRAM_ID } from "../constants";
 
 export const connection = new anchor.web3.Connection(
@@ -16,7 +16,7 @@ export const provider = new anchor.AnchorProvider(
 
 anchor.setProvider(provider);
 
-export const program = new anchor.Program<QuantcoinPresale>(
+export const program = new anchor.Program<ZexxcoinPresale>(
   idl as any,
   provider
 );

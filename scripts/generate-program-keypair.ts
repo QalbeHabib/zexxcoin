@@ -6,10 +6,7 @@ import * as path from "path";
 const programKeypair = Keypair.generate();
 
 // Save the keypair to a JSON file
-const programKeyFile = path.join(
-  __dirname,
-  "../quantcoin_presale-keypair.json"
-);
+const programKeyFile = path.join(__dirname, "../zexxcoin_presale-keypair.json");
 
 // Ensure the directory exists
 const dir = path.dirname(programKeyFile);
@@ -32,6 +29,6 @@ console.log("Program ID:", programKeypair.publicKey.toString());
 console.log("Keypair saved to:", programKeyFile);
 console.log("Program ID saved to:", publicKeyFile);
 console.log("\nPlease update the following files with the new Program ID:");
-console.log("1. programs/constants/src/lib.rs");
+console.log("1. programs/zexxcoin_presale/src/lib.rs");
 console.log("2. Anchor.toml");
 console.log("3. src/constants/index.ts");

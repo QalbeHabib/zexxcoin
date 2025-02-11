@@ -6,7 +6,7 @@ skip-lint = false
 constants = "E146Yz6pKA6USTSqzHZss27vs7jXoBVU6agdXXU97JQC"
 
 [programs.devnet]
-quantcoin_presale = "E146Yz6pKA6USTSqzHZss27vs7jXoBVU6agdXXU97JQC"
+zexxcoin_presale = "E146Yz6pKA6USTSqzHZss27vs7jXoBVU6agdXXU97JQC"
 
 [registry]
 url = "https://api.anchor-api.com"

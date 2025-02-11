@@ -4,7 +4,7 @@ import * as path from "path";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import dotenv from "dotenv";
 
-import idl from "../../target/idl/quantcoin_presale.json";
+import idl from "../../target/idl/zexxcoin_presale.json";
 
 dotenv.config();
 

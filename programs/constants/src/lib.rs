@@ -10,7 +10,7 @@ use instructions::*;
 declare_id!("67did8BtXxNui752tb2cDVFGko2qP6As4sLDdjkdCEeG");
 
 #[program]
-pub mod quantcoin_presale {
+pub mod zexxcoin_presale {
     use super::*;
 
     pub fn create_presale(

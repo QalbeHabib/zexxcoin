@@ -115,6 +115,8 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     
     // Update phase state
     phase.tokens_sold = new_phase_tokens_sold;
+    phase.tokens_available = phase.tokens_available.checked_sub(amount)
+    .ok_or(PresaleError::Overflow)?;
     let phase_complete = phase.is_complete();
     
     // Update presale state
