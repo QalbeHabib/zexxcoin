@@ -13,11 +13,11 @@ pub const PHASE_4_ALLOCATION: u64 = 400_000 * DECIMALS_MULTIPLIER;   // 40% of t
 pub const PHASE_5_ALLOCATION: u64 = 100_000 * DECIMALS_MULTIPLIER;   // 10% of total
 
 // Phase prices in lamports (1 SOL = 1_000_000_000 lamports)
-pub const PHASE_1_PRICE: u64 = 500_000;       // 0.0005 SOL
-pub const PHASE_2_PRICE: u64 = 1_000_000;     // 0.001 SOL
-pub const PHASE_3_PRICE: u64 = 1_500_000;     // 0.0015 SOL
-pub const PHASE_4_PRICE: u64 = 2_000_000;     // 0.002 SOL
-pub const PHASE_5_PRICE: u64 = 2_500_000;     // 0.0025 SOL
+pub const PHASE_1_PRICE: u64 = 40_000;        // 0.00004 SOL (2 SOL total)
+pub const PHASE_2_PRICE: u64 = 23_000;        // 0.000023 SOL (2.3 SOL total)
+pub const PHASE_3_PRICE: u64 = 8_570;         // 0.00000857 SOL (3 SOL total)
+pub const PHASE_4_PRICE: u64 = 9_000;         // 0.000009 SOL (3.6 SOL total)
+pub const PHASE_5_PRICE: u64 = 15_000;        // 0.000015 SOL (1.5 SOL total)
 
 // Minimum and maximum purchase amounts per phase
 pub const PHASE_1_MIN_PURCHASE: u64 = 100 * DECIMALS_MULTIPLIER;     // 100 tokens
@@ -40,11 +40,12 @@ pub const PHASE_4_PERCENTAGE: u8 = 40;
 pub const PHASE_5_PERCENTAGE: u8 = 10;
 
 // Maximum tokens per address: 40,000 tokens
-pub const MAX_TOKENS_PER_ADDRESS: u64 = 40_000 * DECIMALS_MULTIPLIER;
+pub const MAX_TOKENS_PER_ADDRESS: u64 = 10_000 * DECIMALS_MULTIPLIER;
 
 // Maximum cost calculation for reference:
-// Phase 1: 50,000 * 0.0005 = 25 SOL
-// Phase 2: 100,000 * 0.001 = 100 SOL
-// Phase 3: 350,000 * 0.0015 = 525 SOL
-// Phase 4: 400,000 * 0.002 = 800 SOL
-// Phase 5: 100,000 * 0.0025 = 250 SOL 
+// Phase 1: 50,000 * 0.00004 = 2 SOL
+// Phase 2: 100,000 * 0.000023 = 2.3 SOL
+// Phase 3: 350,000 * 0.00000857 = 3 SOL
+// Phase 4: 400,000 * 0.000009 = 3.6 SOL
+// Phase 5: 100,000 * 0.000015 = 1.5 SOL
+// Total: 12.4 SOL 

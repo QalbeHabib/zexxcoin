@@ -37,6 +37,8 @@ pub fn withdraw_sol(ctx: Context<WithdrawSol>, bump: u8) -> Result<()> {
 
     // Check if there's NO balance to withdraw
     require!(vault_balance > 0, PresaleError::EmptyVault);
+    // check if the admin is the authority of the presale
+    require!(ctx.accounts.admin.key() == ctx.accounts.presale_info.authority, PresaleError::InvalidAuthority);
 
     // Transfer all SOL from the vault to the admin
     system_program::transfer(

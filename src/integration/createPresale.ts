@@ -22,12 +22,7 @@ export const createPresale = async () => {
     });
 
     const tx = await program.methods
-      .createPresale(
-        TOKEN_MINT,
-        startTime,
-        endTime,
-        TOKEN_AMOUNTS.MAX_PER_ADDRESS
-      )
+      .createPresale(TOKEN_MINT, TOKEN_AMOUNTS.MAX_PER_ADDRESS)
       .accounts({
         // @ts-ignore
         presaleInfo: presaleAddress,

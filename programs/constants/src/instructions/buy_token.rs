@@ -58,8 +58,6 @@ pub struct BuyToken<'info> {
     pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
-
-
 pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     let presale_info = &mut ctx.accounts.presale_info;
     let user_info = &mut ctx.accounts.user_info;
@@ -83,12 +81,23 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     let phase_number = presale_info.current_phase;
     let max_token_amount = presale_info.max_token_amount_per_address;
     
+    // Validate user's total purchase would not exceed max allowed
+    let new_user_total = user_info.tokens_bought.checked_add(amount)
+        .ok_or(PresaleError::Overflow)?;
+    require!(
+        new_user_total <= max_token_amount,
+        PresaleError::ExceedsMaxAmount
+    );
+    msg!("User's current total: {}, New total after purchase: {}, Max allowed: {}", 
+        user_info.tokens_bought / DECIMALS_MULTIPLIER,
+        new_user_total / DECIMALS_MULTIPLIER,
+        max_token_amount / DECIMALS_MULTIPLIER
+    );
+    
     // First, validate phase and get necessary information
     let (phase_price, is_phase_complete, next_phase_price) = {
         let phase = &presale_info.phases[(phase_number - 1) as usize];
         require!(phase.is_active, PresaleError::PhaseNotActive);
-        require!(amount >= phase.softcap, PresaleError::BelowSoftcap);
-        require!(amount <= phase.hardcap, PresaleError::AboveHardcap);
         require!(amount <= phase.remaining_tokens(), PresaleError::InsufficientTokens);
         
         let tokens_sold_after = phase.tokens_sold.checked_add(amount)
@@ -105,11 +114,6 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
         
         (phase.price, will_complete, next_price)
     };
-
-    // User-specific validations
-    let new_user_total = user_info.tokens_bought.checked_add(amount)
-        .ok_or(PresaleError::Overflow)?;
-    require!(new_user_total <= max_token_amount, PresaleError::ExceedsMaxAmount);
 
     // Calculate payment before any mutations
     let actual_tokens = amount.checked_div(DECIMALS_MULTIPLIER)
@@ -188,6 +192,7 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     msg!("Tokens purchased: {}", amount / DECIMALS_MULTIPLIER);
     msg!("Amount paid: {} lamports", payment_amount);
     msg!("Current phase: {} ({}% sold)", phase_number, final_percentage);
+    msg!("User's total tokens purchased: {}", new_user_total / DECIMALS_MULTIPLIER);
 
     Ok(())
 }
