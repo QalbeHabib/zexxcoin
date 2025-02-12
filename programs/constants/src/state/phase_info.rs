@@ -4,13 +4,13 @@ use anchor_lang::prelude::*;
 pub struct Phase {
     pub phase_number: u8,
     pub amount: u64,          // Amount of tokens allocated for this phase
-    pub price: u64,          // Price in lamports (1 SOL = 1_000_000_000 lamports)
+    pub price: u64,          // Price in lamports
     pub percentage: u8,      // Percentage of total tokens
     pub tokens_sold: u64,    // Tokens sold in this phase
     pub tokens_available: u64, // Tokens available for sale in this phase
     pub is_active: bool,     // Whether this phase is currently active
-    pub start_time: i64,     // Phase start timestamp
-    pub end_time: i64,       // Phase end timestamp
+    pub softcap: u64,       // Minimum target for the phase (soft cap)
+    pub hardcap: u64,       // Maximum limit for the phase (hard cap)
 }
 
 impl Phase {

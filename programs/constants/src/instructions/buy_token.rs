@@ -58,10 +58,11 @@ pub struct BuyToken<'info> {
     pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
+
+
 pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     let presale_info = &mut ctx.accounts.presale_info;
     let user_info = &mut ctx.accounts.user_info;
-    let current_time = Clock::get()?.unix_timestamp;
 
     // Initialize user_info if it's new
     if user_info.wallet == Pubkey::default() {
@@ -77,59 +78,76 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     require!(presale_info.is_initialized, PresaleError::PresaleNotInitialized);
     require!(presale_info.is_active, PresaleError::PresaleNotActive);
     require!(!presale_info.is_ended, PresaleError::PresaleEnded);
-    require!(current_time >= presale_info.start_time, PresaleError::PresaleNotStarted);
-    require!(current_time <= presale_info.end_time, PresaleError::PresaleEnded);
 
-    // Get current phase info first
+    // Get current phase info
     let phase_number = presale_info.current_phase;
     let max_token_amount = presale_info.max_token_amount_per_address;
     
-    // Get phase reference and validate
-    {
+    // First, validate phase and get necessary information
+    let (phase_price, is_phase_complete, next_phase_price) = {
         let phase = &presale_info.phases[(phase_number - 1) as usize];
         require!(phase.is_active, PresaleError::PhaseNotActive);
-        require!(current_time >= phase.start_time, PresaleError::PhaseNotStarted);
-        require!(current_time <= phase.end_time, PresaleError::PhaseEnded);
+        require!(amount >= phase.softcap, PresaleError::BelowSoftcap);
+        require!(amount <= phase.hardcap, PresaleError::AboveHardcap);
         require!(amount <= phase.remaining_tokens(), PresaleError::InsufficientTokens);
-    }
+        
+        let tokens_sold_after = phase.tokens_sold.checked_add(amount)
+            .ok_or(PresaleError::Overflow)?;
+        let tokens_available_after = phase.tokens_available.checked_sub(amount)
+            .ok_or(PresaleError::Overflow)?;
+        
+        let will_complete = tokens_available_after == 0;
+        let next_price = if will_complete && phase_number < PresaleInfo::TOTAL_PHASES as u8 {
+            Some(presale_info.phases[phase_number as usize].price)
+        } else {
+            None
+        };
+        
+        (phase.price, will_complete, next_price)
+    };
 
     // User-specific validations
     let new_user_total = user_info.tokens_bought.checked_add(amount)
         .ok_or(PresaleError::Overflow)?;
     require!(new_user_total <= max_token_amount, PresaleError::ExceedsMaxAmount);
 
-    // Cache all values before any mutations
-    let total_tokens_sold = presale_info.total_tokens_sold;
-    let remaining_tokens = presale_info.remaining_tokens;
-    let phase = &mut presale_info.phases[(phase_number - 1) as usize];
-    let phase_tokens_sold = phase.tokens_sold;
-    let phase_price = phase.price;
-    
-    // Calculate all new values
-    let new_phase_tokens_sold = phase_tokens_sold.checked_add(amount)
-        .ok_or(PresaleError::Overflow)?;
-    let new_total_sold = total_tokens_sold.checked_add(amount)
-        .ok_or(PresaleError::Overflow)?;
-    let new_remaining = remaining_tokens.checked_sub(amount)
-        .ok_or(PresaleError::Overflow)?;
-    
-    // Update phase state
-    phase.tokens_sold = new_phase_tokens_sold;
-    phase.tokens_available = phase.tokens_available.checked_sub(amount)
-    .ok_or(PresaleError::Overflow)?;
-    let phase_complete = phase.is_complete();
-    
-    // Update presale state
-    presale_info.total_tokens_sold = new_total_sold;
-    presale_info.remaining_tokens = new_remaining;
-    
-    // Calculate payment amount in lamports
-    // Convert amount to actual tokens by dividing by DECIMALS_MULTIPLIER
+    // Calculate payment before any mutations
     let actual_tokens = amount.checked_div(DECIMALS_MULTIPLIER)
         .ok_or(PresaleError::Overflow)?;
     let payment_amount = phase_price.checked_mul(actual_tokens)
         .ok_or(PresaleError::Overflow)?;
 
+    // Now perform all mutations
+    {
+        let phase = &mut presale_info.phases[(phase_number - 1) as usize];
+        phase.tokens_sold = phase.tokens_sold.checked_add(amount)
+            .ok_or(PresaleError::Overflow)?;
+        phase.tokens_available = phase.tokens_available.checked_sub(amount)
+            .ok_or(PresaleError::Overflow)?;
+        
+        if is_phase_complete {
+            phase.is_active = false;
+        }
+    }
+
+    // Handle phase transition and global state updates
+    if is_phase_complete && phase_number < PresaleInfo::TOTAL_PHASES as u8 {
+        presale_info.current_phase += 1;
+        presale_info.phases[phase_number as usize].is_active = true;
+        
+        msg!("Phase {} completed! Moving to Phase {}", phase_number, phase_number + 1);
+        if let Some(next_price) = next_phase_price {
+            msg!("New phase price: {} lamports", next_price);
+        }
+    }
+
+    // Update global presale state
+    presale_info.total_tokens_sold = presale_info.total_tokens_sold
+        .checked_add(amount)
+        .ok_or(PresaleError::Overflow)?;
+    presale_info.remaining_tokens = presale_info.remaining_tokens
+        .checked_sub(amount)
+        .ok_or(PresaleError::Overflow)?;
 
     // Transfer SOL from buyer to presale vault
     system_program::transfer(
@@ -143,33 +161,33 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
         payment_amount
     )?;
 
-    // Update user info with all required fields
+    // Update user info
     user_info.tokens_bought = new_user_total;
-    user_info.phase_purchases[(phase_number - 1) as usize] = user_info.phase_purchases[(phase_number - 1) as usize].checked_add(amount)
+    user_info.phase_purchases[(phase_number - 1) as usize] = user_info.phase_purchases[(phase_number - 1) as usize]
+        .checked_add(amount)
         .ok_or(PresaleError::Overflow)?;
-    user_info.last_purchase_time = current_time;
-    user_info.total_paid = user_info.total_paid.checked_add(payment_amount)
+    user_info.last_purchase_time = Clock::get()?.unix_timestamp;
+    user_info.total_paid = user_info.total_paid
+        .checked_add(payment_amount)
         .ok_or(PresaleError::Overflow)?;
-    
-    // Handle phase completion
-    if phase_complete && phase_number < PresaleInfo::TOTAL_PHASES as u8 {
-        let current_phase = &mut presale_info.phases[(phase_number - 1) as usize];
-        current_phase.is_active = false;
-        
-        presale_info.current_phase += 1;
-        let next_phase = &mut presale_info.phases[phase_number as usize];
-        next_phase.is_active = true;
-    }
-    
-    // Check if presale is complete
-    if new_remaining == 0 {
+
+    // Check if presale is complete and update final states
+    if presale_info.remaining_tokens == 0 {
         presale_info.is_ended = true;
         presale_info.is_active = false;
+        msg!("Presale completed! All tokens sold.");
     }
 
-    msg!("Tokens purchased: {} at phase {} price: {} lamports", 
-        amount, phase_number, phase_price);
-    msg!("Tokens can be claimed after phase completion");
+    // Calculate final phase statistics
+    let final_percentage = {
+        let phase = &presale_info.phases[(phase_number - 1) as usize];
+        (phase.tokens_sold * 100) / phase.amount
+    };
+
+    msg!("Purchase successful!");
+    msg!("Tokens purchased: {}", amount / DECIMALS_MULTIPLIER);
+    msg!("Amount paid: {} lamports", payment_amount);
+    msg!("Current phase: {} ({}% sold)", phase_number, final_percentage);
 
     Ok(())
 }

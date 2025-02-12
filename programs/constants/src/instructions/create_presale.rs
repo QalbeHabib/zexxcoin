@@ -28,11 +28,8 @@ pub struct CreatePresale<'info> {
 pub fn create_presale(
     ctx: Context<CreatePresale>,
     token_mint_address: Pubkey,
-    start_time: i64,
-    end_time: i64,
     max_token_amount_per_address: u64,
 ) -> Result<()> {
-    require!(start_time < end_time, PresaleError::InvalidTimeRange);
     require!(max_token_amount_per_address > 0, PresaleError::InvalidAmount);
 
     let presale_info = &mut ctx.accounts.presale_info;
@@ -48,8 +45,8 @@ pub fn create_presale(
             tokens_sold: 0,
             tokens_available: PHASE_1_ALLOCATION,
             is_active: true,
-            start_time,
-            end_time: start_time + (end_time - start_time) / 5,
+            softcap: PHASE_1_MIN_PURCHASE,
+            hardcap: PHASE_1_MAX_PURCHASE,
         },
         Phase {
             phase_number: 2,
@@ -59,8 +56,8 @@ pub fn create_presale(
             tokens_sold: 0,
             tokens_available: PHASE_2_ALLOCATION,
             is_active: false,
-            start_time: start_time + (end_time - start_time) / 5,
-            end_time: start_time + 2 * (end_time - start_time) / 5,
+            softcap: PHASE_2_MIN_PURCHASE,
+            hardcap: PHASE_2_MAX_PURCHASE,
         },
         Phase {
             phase_number: 3,
@@ -70,8 +67,8 @@ pub fn create_presale(
             tokens_sold: 0,
             tokens_available: PHASE_3_ALLOCATION,
             is_active: false,
-            start_time: start_time + 2 * (end_time - start_time) / 5,
-            end_time: start_time + 3 * (end_time - start_time) / 5,
+            softcap: PHASE_3_MIN_PURCHASE,
+            hardcap: PHASE_3_MAX_PURCHASE,
         },
         Phase {
             phase_number: 4,
@@ -81,8 +78,8 @@ pub fn create_presale(
             tokens_sold: 0,
             tokens_available: PHASE_4_ALLOCATION,
             is_active: false,
-            start_time: start_time + 3 * (end_time - start_time) / 5,
-            end_time: start_time + 4 * (end_time - start_time) / 5,
+            softcap: PHASE_4_MIN_PURCHASE,
+            hardcap: PHASE_4_MAX_PURCHASE,
         },
         Phase {
             phase_number: 5,
@@ -92,8 +89,8 @@ pub fn create_presale(
             tokens_sold: 0,
             tokens_available: PHASE_5_ALLOCATION,
             is_active: false,
-            start_time: start_time + 4 * (end_time - start_time) / 5,
-            end_time,
+            softcap: PHASE_5_MIN_PURCHASE,
+            hardcap: PHASE_5_MAX_PURCHASE,
         },
     ];
 
@@ -104,8 +101,6 @@ pub fn create_presale(
     presale_info.current_phase = 1;
     presale_info.phases = phases;
     presale_info.total_tokens_sold = 0;
-    presale_info.start_time = start_time;
-    presale_info.end_time = end_time;
     presale_info.max_token_amount_per_address = max_token_amount_per_address;
     presale_info.authority = authority.key();
     presale_info.is_initialized = true;
@@ -120,6 +115,10 @@ pub fn create_presale(
 
     msg!("Presale initialized for token: {}", presale_info.token_mint_address);
     msg!("Starting with Phase 1: {} tokens @ {} lamports", phases[0].amount, phases[0].price);
+    msg!("Soft cap: {} tokens, Hard cap: {} tokens", 
+        phases[0].softcap / DECIMALS_MULTIPLIER,
+        phases[0].hardcap / DECIMALS_MULTIPLIER
+    );
 
     Ok(())
 }

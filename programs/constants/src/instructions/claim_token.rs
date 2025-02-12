@@ -79,9 +79,6 @@ pub fn claim_token(ctx: Context<ClaimToken>, phase_to_claim: u8) -> Result<()> {
     let phase_amount = user_info.phase_purchases[phase_index];
     require!(phase_amount > 0, PresaleError::InvalidPhase);
 
-    // Check if phase has ended
-    require!(current_time > phase.end_time, PresaleError::PhaseNotEnded);
-
     // Check if tokens for this phase were already claimed
     require!(!user_info.has_claimed, PresaleError::UserAlreadyClaimed);
 

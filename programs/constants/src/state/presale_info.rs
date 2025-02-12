@@ -20,10 +20,6 @@ pub struct PresaleInfo {
     pub total_tokens_sold: u64,
     // Total amount of tokens deposited by admin
     pub total_tokens_deposited: u64,
-    // Start time of entire presale
-    pub start_time: i64,
-    // End time of entire presale
-    pub end_time: i64,
     // Maximum amount of presale tokens an address can purchase
     pub max_token_amount_per_address: u64,
     // Authority of the presale

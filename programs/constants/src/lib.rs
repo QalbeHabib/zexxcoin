@@ -16,15 +16,11 @@ pub mod zexxcoin_presale {
     pub fn create_presale(
         ctx: Context<CreatePresale>,
         token_mint_address: Pubkey,
-        start_time: i64,
-        end_time: i64,
         max_token_amount_per_address: u64,
     ) -> Result<()> {
         instructions::create_presale::create_presale(
             ctx,
             token_mint_address,
-            start_time,
-            end_time,
             max_token_amount_per_address,
         )
     }
