@@ -79,18 +79,22 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
 
     // Get current phase info
     let phase_number = presale_info.current_phase;
+    let phase_index = (phase_number - 1) as usize;
     let max_token_amount = presale_info.max_token_amount_per_address;
     
-    // Validate user's total purchase would not exceed max allowed
-    let new_user_total = user_info.tokens_bought.checked_add(amount)
+    // Validate user's phase-specific purchase would not exceed max tokens per address
+    let current_phase_amount = user_info.phase_purchases[phase_index];
+    let new_phase_total = current_phase_amount.checked_add(amount)
         .ok_or(PresaleError::Overflow)?;
+    
     require!(
-        new_user_total <= max_token_amount,
+        new_phase_total <= max_token_amount,
         PresaleError::ExceedsMaxAmount
     );
-    msg!("User's current total: {}, New total after purchase: {}, Max allowed: {}", 
-        user_info.tokens_bought / DECIMALS_MULTIPLIER,
-        new_user_total / DECIMALS_MULTIPLIER,
+    msg!("Phase {} - Current phase total: {}, New phase total: {}, Max allowed per phase: {}", 
+        phase_number,
+        current_phase_amount / DECIMALS_MULTIPLIER,
+        new_phase_total / DECIMALS_MULTIPLIER,
         max_token_amount / DECIMALS_MULTIPLIER
     );
     
@@ -98,7 +102,7 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     let (phase_price, is_phase_complete, next_phase_price) = {
         let phase = &presale_info.phases[(phase_number - 1) as usize];
         require!(phase.is_active, PresaleError::PhaseNotActive);
-        require!(amount <= phase.remaining_tokens(), PresaleError::InsufficientTokens);
+        require!(amount <= phase.tokens_available, PresaleError::InsufficientTokens);
         
         let tokens_sold_after = phase.tokens_sold.checked_add(amount)
             .ok_or(PresaleError::Overflow)?;
@@ -166,10 +170,8 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     )?;
 
     // Update user info
-    user_info.tokens_bought = new_user_total;
-    user_info.phase_purchases[(phase_number - 1) as usize] = user_info.phase_purchases[(phase_number - 1) as usize]
-        .checked_add(amount)
-        .ok_or(PresaleError::Overflow)?;
+    user_info.tokens_bought = new_phase_total;
+    user_info.phase_purchases[phase_index] = new_phase_total;
     user_info.last_purchase_time = Clock::get()?.unix_timestamp;
     user_info.total_paid = user_info.total_paid
         .checked_add(payment_amount)
@@ -192,7 +194,7 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     msg!("Tokens purchased: {}", amount / DECIMALS_MULTIPLIER);
     msg!("Amount paid: {} lamports", payment_amount);
     msg!("Current phase: {} ({}% sold)", phase_number, final_percentage);
-    msg!("User's total tokens purchased: {}", new_user_total / DECIMALS_MULTIPLIER);
+    msg!("User's total tokens purchased: {}", new_phase_total / DECIMALS_MULTIPLIER);
 
     Ok(())
 }

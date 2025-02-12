@@ -9,15 +9,15 @@ import { formatTokenAmount } from "../utils/format";
 export const createPresale = async () => {
   const { presaleAddress } = await derivePresaleAddress();
 
-  const startTime = new anchor.BN(Math.floor(Date.now() / 1000));
-  const endTime = new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 5); // 5 days
+  // const startTime = new anchor.BN(Math.floor(Date.now() / 1000));
+  // const endTime = new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 5); // 5 days
 
   try {
     console.log("Creating presale with following parameters:");
     console.log({
       tokenMint: TOKEN_MINT.toString(),
-      startTime: new Date(startTime.toNumber() * 1000).toISOString(),
-      endTime: new Date(endTime.toNumber() * 1000).toISOString(),
+      // startTime: new Date(startTime.toNumber() * 1000).toISOString(),
+      // endTime: new Date(endTime.toNumber() * 1000).toISOString(),
       maxTokensPerAddress: formatTokenAmount(TOKEN_AMOUNTS.MAX_PER_ADDRESS),
     });
 
