@@ -1,13 +1,13 @@
 use anchor_lang::{prelude::*, system_program};
 
 use anchor_spl::associated_token::AssociatedToken;
-use anchor_spl::token::{self, Token, TokenAccount, Transfer};
+use anchor_spl::token::{Token, TokenAccount};
 use solana_program::clock::Clock;
 
 use solana_program::account_info::AccountInfo;
 
 use crate::errors::PresaleError;
-use crate::state::{PresaleInfo, UserInfo};
+use crate::state::{PresaleInfo, UserInfo, PhaseStatus};
 use crate::constants::presale_config::DECIMALS_MULTIPLIER;
 
 #[derive(Accounts)]
@@ -72,6 +72,9 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
         user_info.total_paid = 0;
     }
 
+    // Check if presale is in a valid state for participation
+    require!(presale_info.can_participate(), PresaleError::PresaleNotActive);
+
     // Basic validations
     require!(presale_info.is_initialized, PresaleError::PresaleNotInitialized);
     require!(presale_info.is_active, PresaleError::PresaleNotActive);
@@ -101,7 +104,7 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     // First, validate phase and get necessary information
     let (phase_price, is_phase_complete, next_phase_price) = {
         let phase = &presale_info.phases[(phase_number - 1) as usize];
-        require!(phase.is_active, PresaleError::PhaseNotActive);
+        require!(phase.status == PhaseStatus::Active, PresaleError::PhaseNotActive);
         require!(amount <= phase.tokens_available, PresaleError::InsufficientTokens);
         
         let tokens_sold_after = phase.tokens_sold.checked_add(amount)
@@ -134,14 +137,14 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
             .ok_or(PresaleError::Overflow)?;
         
         if is_phase_complete {
-            phase.is_active = false;
+            phase.status = PhaseStatus::Ended;
         }
     }
 
     // Handle phase transition and global state updates
     if is_phase_complete && phase_number < PresaleInfo::TOTAL_PHASES as u8 {
         presale_info.current_phase += 1;
-        presale_info.phases[phase_number as usize].is_active = true;
+        presale_info.phases[phase_number as usize].status = PhaseStatus::Active;
         
         msg!("Phase {} completed! Moving to Phase {}", phase_number, phase_number + 1);
         if let Some(next_price) = next_phase_price {

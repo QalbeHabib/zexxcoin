@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 use crate::errors::PresaleError;
-use crate::state::{PresaleInfo, Phase};
+use crate::state::{PresaleInfo, Phase, PhaseStatus};
 use crate::constants::presale_config::*;
 
 #[derive(Accounts)]
@@ -29,6 +29,7 @@ pub fn create_presale(
     ctx: Context<CreatePresale>,
     token_mint_address: Pubkey,
     max_token_amount_per_address: u64,
+    display_end_time: i64,
 ) -> Result<()> {
     require!(max_token_amount_per_address > 0, PresaleError::InvalidAmount);
 
@@ -44,7 +45,7 @@ pub fn create_presale(
             percentage: PHASE_1_PERCENTAGE,
             tokens_sold: 0,
             tokens_available: PHASE_1_ALLOCATION,
-            is_active: true,
+            status: PhaseStatus::Active,
             softcap: PHASE_1_MIN_PURCHASE,
             hardcap: PHASE_1_MAX_PURCHASE,
         },
@@ -55,7 +56,7 @@ pub fn create_presale(
             percentage: PHASE_2_PERCENTAGE,
             tokens_sold: 0,
             tokens_available: PHASE_2_ALLOCATION,
-            is_active: false,
+            status: PhaseStatus::Upcoming,
             softcap: PHASE_2_MIN_PURCHASE,
             hardcap: PHASE_2_MAX_PURCHASE,
         },
@@ -66,7 +67,7 @@ pub fn create_presale(
             percentage: PHASE_3_PERCENTAGE,
             tokens_sold: 0,
             tokens_available: PHASE_3_ALLOCATION,
-            is_active: false,
+            status: PhaseStatus::Upcoming,
             softcap: PHASE_3_MIN_PURCHASE,
             hardcap: PHASE_3_MAX_PURCHASE,
         },
@@ -77,7 +78,7 @@ pub fn create_presale(
             percentage: PHASE_4_PERCENTAGE,
             tokens_sold: 0,
             tokens_available: PHASE_4_ALLOCATION,
-            is_active: false,
+            status: PhaseStatus::Upcoming,
             softcap: PHASE_4_MIN_PURCHASE,
             hardcap: PHASE_4_MAX_PURCHASE,
         },
@@ -88,7 +89,7 @@ pub fn create_presale(
             percentage: PHASE_5_PERCENTAGE,
             tokens_sold: 0,
             tokens_available: PHASE_5_ALLOCATION,
-            is_active: false,
+            status: PhaseStatus::Upcoming,
             softcap: PHASE_5_MIN_PURCHASE,
             hardcap: PHASE_5_MAX_PURCHASE,
         },
@@ -106,7 +107,8 @@ pub fn create_presale(
     presale_info.is_initialized = true;
     presale_info.is_active = true;
     presale_info.is_ended = false;
-
+    presale_info.is_paused = false;
+    presale_info.display_end_time = display_end_time;
     // Validate phase allocation
     require!(
         presale_info.validate_phase_allocation(),

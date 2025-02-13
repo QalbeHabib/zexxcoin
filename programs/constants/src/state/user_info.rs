@@ -25,7 +25,7 @@ impl UserInfo {
         self.phase_purchases[(phase - 1) as usize] = self.phase_purchases[(phase - 1) as usize]
             .checked_add(amount)
             .ok_or(PresaleError::Overflow)?;
-            
+                
         self.tokens_bought = self.tokens_bought
             .checked_add(amount)
             .ok_or(PresaleError::Overflow)?;

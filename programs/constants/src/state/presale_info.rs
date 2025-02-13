@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::state::phase_info::Phase;
+use crate::state::phase_info::{Phase, PhaseStatus};
 use crate::errors::PresaleError;
 use crate::constants::presale_config::TOTAL_SUPPLY;
 
@@ -30,6 +30,10 @@ pub struct PresaleInfo {
     pub is_active: bool,
     // Presale has ended
     pub is_ended: bool,
+    // Emergency stop flag
+    pub is_paused: bool,
+    // Display end time (Unix timestamp) - for showcase only
+    pub display_end_time: i64,
 }
 
 impl PresaleInfo {
@@ -83,10 +87,10 @@ impl PresaleInfo {
 
         let current_phase = &mut self.phases[(current_phase_num - 1) as usize];
         if current_phase.is_complete() {
-            current_phase.is_active = false;
+            current_phase.status = PhaseStatus::Ended;
             self.current_phase += 1;
             if self.current_phase <= Self::TOTAL_PHASES as u8 {
-                self.phases[self.current_phase as usize - 1].is_active = true;
+                self.phases[self.current_phase as usize - 1].status = PhaseStatus::Active;
             }
             true
         } else {
@@ -108,5 +112,12 @@ impl PresaleInfo {
         self.total_tokens_deposited = self.total_tokens_deposited.checked_sub(amount)
             .ok_or(PresaleError::Overflow)?;
         Ok(())
+    }
+
+    pub fn can_participate(&self) -> bool {
+        self.is_initialized && 
+        self.is_active && 
+        !self.is_ended && 
+        !self.is_paused
     }
 }

@@ -40,4 +40,8 @@ pub enum PresaleError {
     InsufficientDeposit,
     #[msg("Invalid amount")]
     InvalidAmount,
+    #[msg("Presale is paused")]
+    PresalePaused,
+    #[msg("Presale time window has expired")]
+    PresaleTimeExpired,
 }

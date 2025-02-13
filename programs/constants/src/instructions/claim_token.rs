@@ -4,7 +4,7 @@ use {
 };
 
 use crate::errors::PresaleError;
-use crate::state::{PresaleInfo, UserInfo};
+use crate::state::{PresaleInfo, UserInfo, PhaseStatus};
 use anchor_spl::token::Token;
 use anchor_spl::associated_token::AssociatedToken;
 
@@ -79,6 +79,12 @@ pub fn claim_token(ctx: Context<ClaimToken>, phase_to_claim: u8) -> Result<()> {
     let phase_amount = user_info.phase_purchases[phase_index];
     require!(phase_amount > 0, PresaleError::InvalidPhase);
 
+    // Check if phase is ended or active
+    require!(
+        phase.status == PhaseStatus::Ended || phase.status == PhaseStatus::Active,
+        PresaleError::PhaseNotActive
+    );
+
     // Check if tokens for this phase were already claimed
     require!(!user_info.phase_claims[phase_index], PresaleError::UserAlreadyClaimed);
 
@@ -106,10 +112,14 @@ pub fn claim_token(ctx: Context<ClaimToken>, phase_to_claim: u8) -> Result<()> {
     user_info.phase_claims[phase_index] = true;
     user_info.last_purchase_time = current_time;
 
-    // Calculate remaining claimable tokens
+    // Calculate remaining claimable tokens from ended or active phases
     let remaining_claimable = user_info.phase_purchases.iter()
         .enumerate()
-        .filter(|(i, &amount)| !user_info.phase_claims[*i] && amount > 0)
+        .filter(|(i, &amount)| {
+            let phase_status = presale_info.phases[*i].status;
+            !user_info.phase_claims[*i] && amount > 0 && 
+            (phase_status == PhaseStatus::Ended || phase_status == PhaseStatus::Active)
+        })
         .map(|(_, &amount)| amount)
         .sum::<u64>();
 
