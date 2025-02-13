@@ -68,7 +68,7 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
         user_info.tokens_bought = 0;
         user_info.phase_purchases = [0; 5];
         user_info.last_purchase_time = 0;
-        user_info.has_claimed = false;
+        user_info.phase_claims = [false; 5];  // Initialize all phases as unclaimed
         user_info.total_paid = 0;
     }
 
@@ -170,8 +170,11 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     )?;
 
     // Update user info
-    user_info.tokens_bought = new_phase_total;
     user_info.phase_purchases[phase_index] = new_phase_total;
+    // Calculate total tokens bought as sum of all phases
+    user_info.tokens_bought = user_info.phase_purchases.iter()
+        .fold(0, |acc, &phase_amount| acc.checked_add(phase_amount)
+            .unwrap_or(acc));
     user_info.last_purchase_time = Clock::get()?.unix_timestamp;
     user_info.total_paid = user_info.total_paid
         .checked_add(payment_amount)
