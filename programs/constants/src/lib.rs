@@ -7,7 +7,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("AtDQAQJ9NyymGbQYeW3zqFEAcMJUrpNTUWXL5HgDbTvL");
+declare_id!("88uaiF6Lqq3id6idy6zMv8Pfc4sXb3gvQNLCMWWQHHCL");
 
 #[program]
 pub mod zexxcoin_presale {

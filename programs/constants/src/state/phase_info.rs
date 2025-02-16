@@ -3,9 +3,19 @@ use anchor_lang::prelude::*;
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default, Debug, PartialEq)]
 pub enum PhaseStatus {
     #[default]
-    Upcoming,
-    Active,
-    Ended
+    Upcoming = 0,
+    Active = 1,
+    Ended = 2
+}
+
+impl PhaseStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            PhaseStatus::Upcoming => "Upcoming",
+            PhaseStatus::Active => "Active",
+            PhaseStatus::Ended => "Ended",
+        }
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default, Debug)]
