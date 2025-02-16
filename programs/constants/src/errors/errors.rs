@@ -2,10 +2,10 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum PresaleError {
-    #[msg("Invalid time range")]
-    InvalidTimeRange,
-    #[msg("Invalid amount")]
-    InvalidAmount,
+    #[msg("Amount below soft cap")]
+    BelowSoftcap,
+    #[msg("Amount above hard cap")]
+    AboveHardcap,
     #[msg("Invalid price")]
     InvalidPrice,
     #[msg("Insufficient funds")]
@@ -16,20 +16,10 @@ pub enum PresaleError {
     PresaleNotActive,
     #[msg("Presale has ended")]
     PresaleEnded,
-    #[msg("Presale has not started")]
-    PresaleNotStarted,
-    #[msg("Presale not ended yet")]
-    PresaleNotEnded,
     #[msg("Invalid phase")]
     InvalidPhase,
     #[msg("Phase not active")]
     PhaseNotActive,
-    #[msg("Phase has not started")]
-    PhaseNotStarted,
-    #[msg("Phase has ended")]
-    PhaseEnded,
-    #[msg("Phase not ended yet")]
-    PhaseNotEnded,
     #[msg("Insufficient tokens in current phase")]
     InsufficientTokens,
     #[msg("Exceeds maximum tokens per address")]
@@ -46,10 +36,12 @@ pub enum PresaleError {
     InvalidTokenAccount,
     #[msg("Empty vault")]
     EmptyVault,
-    #[msg("Invalid hardcap")]
-    InvalidHardcap,
-    #[msg("Invalid softcap")]
-    InvalidSoftcap,
     #[msg("Insufficient deposited tokens")]
     InsufficientDeposit,
+    #[msg("Invalid amount")]
+    InvalidAmount,
+    #[msg("Presale is paused")]
+    PresalePaused,
+    #[msg("Presale time window has expired")]
+    PresaleTimeExpired,
 }

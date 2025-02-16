@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
-use crate::state::phase_info::Phase;
+use crate::state::phase_info::{Phase, PhaseStatus};
 use crate::errors::PresaleError;
+use crate::constants::presale_config::TOTAL_SUPPLY;
 
 #[account]
 #[derive(Default)]
 pub struct PresaleInfo {
     // Mint address of the presale token
     pub token_mint_address: Pubkey,
-    // Total token supply for presale (50,000,000)
+    // Total token supply for presale (1,000,000)
     pub total_token_supply: u64,
     // Remaining tokens to be sold across all phases
     pub remaining_tokens: u64,
@@ -19,10 +20,6 @@ pub struct PresaleInfo {
     pub total_tokens_sold: u64,
     // Total amount of tokens deposited by admin
     pub total_tokens_deposited: u64,
-    // Start time of entire presale
-    pub start_time: i64,
-    // End time of entire presale
-    pub end_time: i64,
     // Maximum amount of presale tokens an address can purchase
     pub max_token_amount_per_address: u64,
     // Authority of the presale
@@ -33,11 +30,15 @@ pub struct PresaleInfo {
     pub is_active: bool,
     // Presale has ended
     pub is_ended: bool,
+    // Emergency stop flag
+    pub is_paused: bool,
+    // Display end time (Unix timestamp) - for showcase only
+    pub display_end_time: i64,
 }
 
 impl PresaleInfo {
     pub const TOTAL_PHASES: usize = 5;
-    pub const TOTAL_SUPPLY: u64 = 50_000_000;
+    pub const TOTAL_SUPPLY: u64 = TOTAL_SUPPLY;
 
     pub fn get_current_phase(&self) -> Option<&Phase> {
         if self.current_phase == 0 || self.current_phase > Self::TOTAL_PHASES as u8 {
@@ -86,10 +87,10 @@ impl PresaleInfo {
 
         let current_phase = &mut self.phases[(current_phase_num - 1) as usize];
         if current_phase.is_complete() {
-            current_phase.is_active = false;
+            current_phase.status = PhaseStatus::Ended;
             self.current_phase += 1;
             if self.current_phase <= Self::TOTAL_PHASES as u8 {
-                self.phases[self.current_phase as usize - 1].is_active = true;
+                self.phases[self.current_phase as usize - 1].status = PhaseStatus::Active;
             }
             true
         } else {
@@ -111,5 +112,12 @@ impl PresaleInfo {
         self.total_tokens_deposited = self.total_tokens_deposited.checked_sub(amount)
             .ok_or(PresaleError::Overflow)?;
         Ok(())
+    }
+
+    pub fn can_participate(&self) -> bool {
+        self.is_initialized && 
+        self.is_active && 
+        !self.is_ended && 
+        !self.is_paused
     }
 }

@@ -10,8 +10,8 @@ pub struct UserInfo {
     pub phase_purchases: [u64; 5],
     // Last purchase timestamp
     pub last_purchase_time: i64,
-    // Whether user has claimed their tokens
-    pub has_claimed: bool,
+    // Array to track which phases have been claimed [phase1_claimed, phase2_claimed, ...]
+    pub phase_claims: [bool; 5],
     // The wallet address of the user
     pub wallet: Pubkey,
     // Total amount paid in lamports
@@ -25,7 +25,7 @@ impl UserInfo {
         self.phase_purchases[(phase - 1) as usize] = self.phase_purchases[(phase - 1) as usize]
             .checked_add(amount)
             .ok_or(PresaleError::Overflow)?;
-            
+                
         self.tokens_bought = self.tokens_bought
             .checked_add(amount)
             .ok_or(PresaleError::Overflow)?;

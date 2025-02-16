@@ -1,200 +1,189 @@
-# Terminus Presale Program
+# Quant Coin Presale Program
 
-A Solana-based presale program that implements a phased token sale system with increasing prices per phase. This program allows for a controlled distribution of tokens through multiple phases with different allocations and pricing.
+A Solana program for managing a multi-phase token presale with advanced features and safety mechanisms.
 
 ## Overview
 
-The Terminus Presale Program is designed to facilitate a token presale with the following features:
-
-- 5 distinct presale phases with different token allocations and prices
-- Total supply of 50,000,000 tokens
-- Automated phase transitions
-- Token claiming system
-- Admin controls for token deposits and SOL withdrawals
-
-## Presale Phases
-
-The presale is divided into 5 phases with the following allocations:
-
-| Phase | Allocation | Percentage | Price (SOL) | Tokens Available |
-| ----- | ---------- | ---------- | ----------- | ---------------- |
-| 1     | 2,500,000  | 5%         | 0.19999     | 2,500,000        |
-| 2     | 5,000,000  | 10%        | 0.39999     | 5,000,000        |
-| 3     | 17,500,000 | 35%        | 0.49999     | 17,500,000       |
-| 4     | 20,000,000 | 40%        | 0.59999     | 20,000,000       |
-| 5     | 5,000,000  | 10%        | 0.69999     | 5,000,000        |
+The Quant Coin Presale Program is a sophisticated Solana smart contract that manages a token presale across multiple phases. It includes features like phase management, emergency controls, and user purchase tracking.
 
 ## Features
 
-- **Phase Management**: Automatic transition between phases based on time and token sales
-- **Price Tiers**: Increasing price tiers across phases
-- **Purchase Limits**: Configurable maximum token purchase limit per address
-- **Token Deposits**: Admin can deposit tokens to be distributed during the presale
-- **Token Claims**: Users can claim their purchased tokens after the presale ends
-- **SOL Withdrawal**: Admin can withdraw collected SOL from sales
+### Phase Management
 
-## Getting Started
+- 5 distinct presale phases with different allocations and prices
+- Automatic phase transitions
+- Phase status tracking (Upcoming, Active, Ended)
+- Per-phase purchase limits and tracking
+
+### Phase Details
+
+1. **Phase 1**
+
+   - Allocation: 50,000 tokens (5%)
+   - Price: 0.00004 SOL per token
+   - Soft cap: 100 tokens
+   - Hard cap: 50,000 tokens
+
+2. **Phase 2**
+
+   - Allocation: 100,000 tokens (10%)
+   - Price: 0.000023 SOL per token
+   - Soft cap: 200 tokens
+   - Hard cap: 100,000 tokens
+
+3. **Phase 3**
+
+   - Allocation: 350,000 tokens (35%)
+   - Price: 0.00000857 SOL per token
+   - Soft cap: 300 tokens
+   - Hard cap: 350,000 tokens
+
+4. **Phase 4**
+
+   - Allocation: 400,000 tokens (40%)
+   - Price: 0.000009 SOL per token
+   - Soft cap: 400 tokens
+   - Hard cap: 400,000 tokens
+
+5. **Phase 5**
+   - Allocation: 100,000 tokens (10%)
+   - Price: 0.000015 SOL per token
+   - Soft cap: 500 tokens
+   - Hard cap: 100,000 tokens
+
+### Security Features
+
+- Emergency stop functionality
+- Admin-only controls
+- Purchase limits per address
+- Secure token vault management
+
+### User Features
+
+- Individual purchase tracking
+- Phase-specific purchase history
+- Token claiming system
+- Purchase history preservation
+
+## Program Instructions
+
+### Admin Instructions
+
+1. `create_presale`
+
+   - Initializes the presale with token mint and parameters
+   - Sets up initial phase configuration
+
+2. `deposit_token`
+
+   - Allows admin to deposit presale tokens
+   - Initializes token vault
+
+3. `withdraw_sol`
+
+   - Allows admin to withdraw collected SOL
+   - Only accessible by presale authority
+
+4. `emergency_stop`
+
+   - Immediately pauses all presale operations
+   - Admin-only function for emergency situations
+
+5. `resume_presale`
+   - Resumes paused presale operations
+   - Sets new display end time
+   - Admin-only function
+
+### User Instructions
+
+1. `buy_token`
+
+   - Purchase tokens in current active phase
+   - Automatically handles phase transitions
+   - Enforces purchase limits
+
+2. `claim_token`
+   - Claim purchased tokens from specific phases
+   - Maintains purchase history
+   - Prevents double claims
+
+## Phase Status System
+
+The program uses an enumerated status system for phases:
+
+- `Upcoming (0)`: Phase not yet started
+- `Active (1)`: Phase currently accepting purchases
+- `Ended (2)`: Phase completed
+
+## Technical Details
+
+### Token Configuration
+
+- Decimals: 9 (same as SOL)
+- Total Supply: 1,000,000 tokens
+- Max Tokens Per Address: 20,000 tokens (2% of total supply)
+
+### Program Accounts
+
+1. `PresaleInfo`: Main presale state account
+2. `UserInfo`: Individual user purchase records
+3. `Phase`: Phase-specific information and status
+
+## Integration
+
+The program includes TypeScript integration scripts for all major functions:
+
+- `createPresale.ts`: Initialize presale
+- `depositToken.ts`: Deposit presale tokens
+- `buyToken.ts`: Purchase tokens
+- `claimToken.ts`: Claim purchased tokens
+
+## Safety Mechanisms
+
+1. **Purchase Validation**
+
+   - Soft cap enforcement
+   - Hard cap limits
+   - Per-address limits
+   - Phase status checks
+
+2. **State Protection**
+
+   - Purchase history preservation
+   - Phase-specific claim tracking
+   - Emergency stop capability
+
+3. **Access Control**
+   - Admin-only functions
+   - PDA-based account validation
+   - Secure vault management
+
+## Development
 
 ### Prerequisites
 
-- Node.js v14+ and npm
-- Rust and Cargo
 - Solana Tool Suite
 - Anchor Framework
+- Node.js and npm/yarn
 
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/terminus-presale.git
-cd terminus-presale
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Build the program:
+### Building
 
 ```bash
 anchor build
 ```
 
-### Configuration
+### Testing
 
-1. Create a `.env` file with the following variables:
-
-```env
-BUYER_PRIVATE_KEY=your_private_key_here
+```bash
+anchor test
 ```
 
-2. Update the `keypair.json` file with your admin wallet credentials.
+### Deployment
 
-## Usage
-
-### Initialize Presale
-
-Create a new presale with specified parameters:
-
-```typescript
-const createPresale = async () => {
-  const maxTokenAmountPerAddress = solToLamports(0.1);
-  const startTime = new anchor.BN(Math.floor(Date.now() / 1000));
-  const endTime = new anchor.BN(Math.floor(Date.now() / 1000) + 86400 * 5); // 5 days
-
-  await program.methods
-    .createPresale(TOKEN_MINT, startTime, endTime, maxTokenAmountPerAddress)
-    .accounts({...})
-    .signers([authorityKeypair])
-    .rpc();
-};
+```bash
+anchor deploy
 ```
-
-### Deposit Tokens
-
-Admin can deposit tokens to be distributed during the presale:
-
-```typescript
-const depositToken = async (amount: anchor.BN) => {
-  await program.methods
-    .depositToken(amount)
-    .accounts({...})
-    .signers([authorityKeypair])
-    .rpc();
-};
-```
-
-### Buy Tokens
-
-Users can purchase tokens during the active phase:
-
-```typescript
-const buyToken = async (amount: anchor.BN) => {
-  await program.methods
-    .buyToken(amount)
-    .accounts({...})
-    .signers([buyerKeypair])
-    .rpc();
-};
-```
-
-### Claim Tokens
-
-Users can claim their purchased tokens after the presale ends:
-
-```typescript
-const claimToken = async () => {
-  await program.methods
-    .claimToken(bump)
-    .accounts({...})
-    .signers([buyerKeypair])
-    .rpc();
-};
-```
-
-## Program Architecture
-
-### Key Accounts
-
-1. **PresaleInfo**: Stores presale configuration and state
-
-   - Token mint address
-   - Total supply and remaining tokens
-   - Phase information
-   - Start and end times
-   - Maximum tokens per address
-
-2. **UserInfo**: Tracks individual user participation
-
-   - Tokens bought
-   - Phase purchases
-   - Claim status
-   - Total amount paid
-
-3. **PresaleVault**: Holds collected SOL from token sales
-
-### Phase Management
-
-Each phase is defined by:
-
-- Token allocation
-- Price per token
-- Start and end times
-- Active status
-- Tokens sold and available
-
-Phases automatically transition when:
-
-- Current phase's tokens are sold out
-- Current phase's time period ends
-
-## Security Features
-
-- PDA-based account derivation
-- Authority checks for admin operations
-- Purchase limit enforcement
-- Phase-based price enforcement
-- Token deposit verification
-- Claim verification
-
-## Error Handling
-
-The program includes comprehensive error handling for:
-
-- Invalid time ranges
-- Insufficient funds
-- Phase state violations
-- Purchase limit violations
-- Token availability
-- Claim conditions
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+[Add your license information here]

@@ -6,27 +6,24 @@ pub mod instructions;
 pub mod state;
 
 use instructions::*;
-use errors::*;
 
-declare_id!("EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU");
+declare_id!("88uaiF6Lqq3id6idy6zMv8Pfc4sXb3gvQNLCMWWQHHCL");
 
 #[program]
-pub mod terminus_presale {
+pub mod zexxcoin_presale {
     use super::*;
 
     pub fn create_presale(
         ctx: Context<CreatePresale>,
         token_mint_address: Pubkey,
-        start_time: i64,
-        end_time: i64,
         max_token_amount_per_address: u64,
+        display_end_time: i64,
     ) -> Result<()> {
         instructions::create_presale::create_presale(
             ctx,
             token_mint_address,
-            start_time,
-            end_time,
             max_token_amount_per_address,
+            display_end_time,
         )
     }
 
@@ -38,11 +35,19 @@ pub mod terminus_presale {
         instructions::buy_token::buy_token(ctx, amount)
     }
 
-    pub fn claim_token(ctx: Context<ClaimToken>, bump: u8) -> Result<()> {
-        instructions::claim_token::claim_token(ctx, bump)
+    pub fn claim_token(ctx: Context<ClaimToken>, phase_to_claim: u8) -> Result<()> {
+        instructions::claim_token::claim_token(ctx, phase_to_claim)
     }
 
     pub fn withdraw_sol(ctx: Context<WithdrawSol>, bump: u8) -> Result<()> {
         instructions::withdraw_sol::withdraw_sol(ctx, bump)
+    }
+
+    pub fn emergency_stop(ctx: Context<EmergencyStop>) -> Result<()> {
+        instructions::emergency_stop::emergency_stop(ctx)
+    }
+
+    pub fn resume_presale(ctx: Context<ResumePresale>, display_end_time: i64) -> Result<()> {
+        instructions::resume_presale::resume_presale(ctx, display_end_time)
     }
 }

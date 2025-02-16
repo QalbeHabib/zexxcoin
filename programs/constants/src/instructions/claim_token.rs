@@ -4,7 +4,7 @@ use {
 };
 
 use crate::errors::PresaleError;
-use crate::state::{PresaleInfo, UserInfo};
+use crate::state::{PresaleInfo, UserInfo, PhaseStatus};
 use anchor_spl::token::Token;
 use anchor_spl::associated_token::AssociatedToken;
 
@@ -79,11 +79,14 @@ pub fn claim_token(ctx: Context<ClaimToken>, phase_to_claim: u8) -> Result<()> {
     let phase_amount = user_info.phase_purchases[phase_index];
     require!(phase_amount > 0, PresaleError::InvalidPhase);
 
-    // Check if phase has ended
-    require!(current_time > phase.end_time, PresaleError::PhaseNotEnded);
+    // Check if phase is ended or active
+    require!(
+        phase.status == PhaseStatus::Ended || phase.status == PhaseStatus::Active,
+        PresaleError::PhaseNotActive
+    );
 
     // Check if tokens for this phase were already claimed
-    require!(!user_info.has_claimed, PresaleError::UserAlreadyClaimed);
+    require!(!user_info.phase_claims[phase_index], PresaleError::UserAlreadyClaimed);
 
     msg!("Claiming {} tokens from phase {}", phase_amount, phase_to_claim);
     
@@ -105,15 +108,23 @@ pub fn claim_token(ctx: Context<ClaimToken>, phase_to_claim: u8) -> Result<()> {
         phase_amount,
     )?;
 
-    // Update user info
-    user_info.tokens_bought = user_info.tokens_bought.checked_sub(phase_amount)
-        .ok_or(PresaleError::Overflow)?;
-    user_info.phase_purchases[phase_index] = 0;
-    user_info.has_claimed = true;
+    // Update user info - only mark this phase as claimed
+    user_info.phase_claims[phase_index] = true;
     user_info.last_purchase_time = current_time;
 
+    // Calculate remaining claimable tokens from ended or active phases
+    let remaining_claimable = user_info.phase_purchases.iter()
+        .enumerate()
+        .filter(|(i, &amount)| {
+            let phase_status = presale_info.phases[*i].status;
+            !user_info.phase_claims[*i] && amount > 0 && 
+            (phase_status == PhaseStatus::Ended || phase_status == PhaseStatus::Active)
+        })
+        .map(|(_, &amount)| amount)
+        .sum::<u64>();
+
     msg!("Successfully claimed {} tokens from phase {}", phase_amount, phase_to_claim);
-    msg!("Remaining tokens to claim: {}", user_info.tokens_bought);
+    msg!("Remaining claimable tokens: {}", remaining_claimable);
 
     Ok(())
 }

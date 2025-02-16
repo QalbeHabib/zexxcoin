@@ -4,8 +4,8 @@
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
     "build": "anchor build",
     "deploy": "anchor deploy",
-    "upgrade": "anchor upgrade target/deploy/constants.so --program-id EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU",
-    "upgrade:devnet": "anchor upgrade target/deploy/constants.so --program-id EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU --provider.cluster devnet",
+    "upgrade": "anchor upgrade target/deploy/zexxcoin_presale.so --program-id EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU",
+    "upgrade:devnet": "anchor upgrade target/deploy/zexxcoin_presale.so --program-id EJUZr94a1HyNdoAGPdQTATKisvKPMSTaK8cDRsFwoNSU --provider.cluster devnet",
     "deploy:all": "yarn build && yarn upgrade",
     "deploy:devnet": "yarn build && yarn upgrade:devnet",
     "create-presale": "ts-node src/integration/createPresale.ts",
@@ -15,7 +15,11 @@
     "create-token": "ts-node src/token-creation/create-token.ts",
     "airdrop": "ts-node src/utils/airdrop.ts",
     "update-token-config": "ts-node src/token-creation/update-token-config.ts",
-    "upload-assets": "ts-node src/token-creation/upload-token-assets.ts"
+    "upload-assets": "ts-node src/token-creation/upload-token-assets.ts",
+    "generate-program-keypair": "ts-node scripts/generate-program-keypair.ts",
+    "deploy-program": "ts-node scripts/deploy-program.ts",
+    "setup-and-deploy": "yarn generate-program-keypair && yarn deploy-program",
+    "close-program": "ts-node closeProgram/closeProgram.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.30.1",

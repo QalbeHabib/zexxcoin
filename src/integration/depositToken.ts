@@ -7,6 +7,8 @@ import { SystemProgram } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
 import { program, connection } from "../config/integrationConnection";
 import { authorityKeypair, TOKEN_MINT } from "../constants";
+import { TOKEN_AMOUNTS } from "../constants/token";
+import { formatTokenAmount } from "../utils/format";
 import { derivePresaleAddress, derivePresaleVaultAddress } from "../utils/pda";
 
 // Helper function to convert SOL to lamports with proper BN handling
@@ -16,8 +18,11 @@ const solToLamports = (amount: number): anchor.BN => {
   return new anchor.BN(lamports);
 };
 
-export const depositToken = async (amount: anchor.BN) => {
+export const depositToken = async () => {
   try {
+    // Using the total supply from constants
+    const depositAmount = TOKEN_AMOUNTS.TOTAL_SUPPLY;
+
     const { presaleAddress } = await derivePresaleAddress();
     const { presaleVault } = await derivePresaleVaultAddress();
 
@@ -30,20 +35,35 @@ export const depositToken = async (amount: anchor.BN) => {
     const presaleTokenAccount = await getAssociatedTokenAddressSync(
       TOKEN_MINT,
       presaleAddress,
-      true // allow owner off curve
+      true
     );
 
     // Verify token balance
     const tokenBalance =
       await connection.getTokenAccountBalance(adminTokenAccount);
-    if (Number(tokenBalance.value.amount) < amount.toNumber()) {
+    console.log(
+      "Current admin token balance:",
+      formatTokenAmount(tokenBalance.value.amount)
+    );
+
+    if (new anchor.BN(tokenBalance.value.amount).lt(depositAmount)) {
       throw new Error(
-        `Insufficient token balance. Required: ${amount}, Available: ${tokenBalance.value.amount}`
+        `Insufficient token balance. Required: ${formatTokenAmount(depositAmount)}, Available: ${formatTokenAmount(tokenBalance.value.amount)}`
       );
     }
 
+    console.log("Depositing tokens with following details:");
+    console.log({
+      amount: formatTokenAmount(depositAmount),
+      rawAmount: depositAmount.toString(),
+      adminTokenAccount: adminTokenAccount.toString(),
+      presaleTokenAccount: presaleTokenAccount.toString(),
+      presaleAddress: presaleAddress.toString(),
+      presaleVault: presaleVault.toString(),
+    });
+
     const tx = await program.methods
-      .depositToken(amount)
+      .depositToken(depositAmount)
       .accounts({
         mintAccount: TOKEN_MINT,
         // @ts-ignore
@@ -52,8 +72,6 @@ export const depositToken = async (amount: anchor.BN) => {
         toAssociatedTokenAccount: presaleTokenAccount,
         presaleVault,
         presaleInfo: presaleAddress,
-
-        // system programs arguments
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -62,17 +80,40 @@ export const depositToken = async (amount: anchor.BN) => {
       .signers([authorityKeypair])
       .rpc();
 
-    console.log("Tokens deposited successfully! Transaction signature:", tx);
+    console.log("Tokens deposited successfully!");
+    console.log("Transaction signature:", tx);
+
+    // Verify the deposit
+    const newBalance =
+      await connection.getTokenAccountBalance(presaleTokenAccount);
+    console.log(
+      "Presale token account balance after deposit:",
+      formatTokenAmount(newBalance.value.amount)
+    );
+
     return tx;
   } catch (error) {
     console.error("Error depositing tokens:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      if ("logs" in error) {
+        console.error("Program logs:", (error as any).logs);
+      }
+    }
     throw error;
   }
 };
 
 // Execute if running directly
 if (require.main === module) {
-  // Use the updated solToLamports function with a smaller test amount first
-  const depositAmount = solToLamports(0); // Testing with 1000 tokens first
-  depositToken(depositAmount).catch(console.error);
+  console.log("Starting token deposit...");
+  depositToken()
+    .then(() => {
+      console.log("Deposit completed successfully!");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Deposit failed:", error);
+      process.exit(1);
+    });
 }

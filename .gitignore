@@ -9,3 +9,4 @@ wallets
 wallets/admin.json
 .env
 keypair.json
+closeProgram
