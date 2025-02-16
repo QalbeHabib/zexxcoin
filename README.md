@@ -185,5 +185,3 @@ anchor deploy
 ```
 
 ## License
-
-[Add your license information here]
