@@ -1,20 +1,55 @@
 {
-    "name": "Your Token Name",
-    "symbol": "SYMBOL",
-    "description": "Your token description goes here",
-    "image": "https://your-token-image-uri.png",
-    "external_url": "https://your-website.com",
+    "name": "DevDots",
+    "symbol": "DDT",
+    "description": "DevDots Token",
+    "image": "https://image.url",
+    "external_url": "https://devdots.org",
     "attributes": [
         {
             "trait_type": "Category",
-            "value": "Token"
+            "value": "Utility Token"
+        },
+        {
+            "trait_type": "Website",
+            "value": "https://devdots.org"
+        },
+        {
+            "trait_type": "Twitter",
+            "value": "https://twitter.com/devdots"
+        },
+        {
+            "trait_type": "Telegram",
+            "value": "https://t.me/devdots"
+        },
+        {
+            "trait_type": "Discord",
+            "value": "https://discord.gg/devdots"
+        },
+        {
+            "trait_type": "GitHub",
+            "value": "https://github.com/devdots"
+        },
+        {
+            "trait_type": "Total Supply",
+            "value": "1,000,000"
+        },
+        {
+            "trait_type": "Decimals",
+            "value": "9"
         }
     ],
     "properties": {
         "files": [
             {
-                "uri": "https://your-token-image-uri.png",
+                "uri": "https://image.url",
                 "type": "image/png"
+            }
+        ],
+        "category": "image",
+        "creators": [
+            {
+                "address": "<your-wallet-address>",
+                "share": 100
             }
         ]
     }

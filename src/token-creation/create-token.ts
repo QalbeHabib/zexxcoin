@@ -20,6 +20,7 @@ async function createTokenWithMetadata() {
   try {
     const connection = getConnection();
     const payer = getPayer();
+    console.log("payer", payer.publicKey.toBase58());
 
     console.log("Creating token mint...");
     // 1. Create the token mint

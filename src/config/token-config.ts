@@ -1,11 +1,16 @@
 export const TOKEN_CONFIG = {
-  name: "Example Token",
-  symbol: "EXTKN",
-  description: "Example token for demonstration",
-  decimals: 9,
-  initialSupply: 1_000_000_000, // 1 billion tokens
-  image: "https://raw.githubusercontent.com/your-repo/token-image.png",
-  externalUrl: "https://your-project-website.com",
-  disableMintingAfterInit: false,
-  sellerFeeBasisPoints: 0,
-};
+    name: "DevDots",
+    symbol: "DDT",
+    description: "DevDots Token",
+    decimals: 9,
+    initialSupply: 1000000,
+    image: "https://image.url",
+    externalUrl: "https://devdots.org",
+    website: "https://devdots.org",
+    twitter: "https://twitter.com/devdots",
+    telegram: "https://t.me/devdots",
+    discord: "https://discord.gg/devdots",
+    github: "https://github.com/devdots",
+    disableMintingAfterInit: false,
+    sellerFeeBasisPoints: 0,
+}

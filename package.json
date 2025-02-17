@@ -16,6 +16,8 @@
     "airdrop": "ts-node src/utils/airdrop.ts",
     "update-token-config": "ts-node src/token-creation/update-token-config.ts",
     "upload-assets": "ts-node src/token-creation/upload-token-assets.ts",
+    "update-metadata": "ts-node src/token-creation/update-metadata.ts",
+    "upload-to-arweave": "ts-node src/token-creation/upload-to-arweave.ts",
     "generate-program-keypair": "ts-node scripts/generate-program-keypair.ts",
     "deploy-program": "ts-node scripts/deploy-program.ts",
     "setup-and-deploy": "yarn generate-program-keypair && yarn deploy-program",
@@ -28,7 +30,9 @@
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-token": "^0.4.12",
     "@solana/web3.js": "^1.98.0",
+    "@types/bs58": "^4.0.4",
     "bn.js": "*",
+    "bs58": "^6.0.0",
     "dotenv": "^16.4.7"
   },
   "devDependencies": {

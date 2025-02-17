@@ -1,4 +1,5 @@
 import { Connection, Keypair } from "@solana/web3.js";
+import * as bs58 from "bs58";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -15,10 +16,21 @@ export const getPayer = (): Keypair => {
     throw new Error("WALLET_PRIVATE_KEY not found in environment variables");
   }
 
-  // Convert private key string to Uint8Array
-  const privateKeyBytes = new Uint8Array(
-    privateKey.split(",").map((num) => parseInt(num))
-  );
-
-  return Keypair.fromSecretKey(privateKeyBytes);
+  try {
+    // First try base58 format
+    const decodedKey = bs58.default.decode(privateKey);
+    return Keypair.fromSecretKey(decodedKey);
+  } catch (e) {
+    // If base58 fails, try comma-separated format
+    try {
+      const privateKeyBytes = new Uint8Array(
+        privateKey.split(",").map((num) => parseInt(num))
+      );
+      return Keypair.fromSecretKey(privateKeyBytes);
+    } catch (e2) {
+      throw new Error(
+        "Invalid private key format. Must be either base58 or comma-separated numbers."
+      );
+    }
+  }
 };
