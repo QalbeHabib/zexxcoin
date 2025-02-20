@@ -93,6 +93,17 @@ pub fn create_presale(
             softcap: PHASE_5_MIN_PURCHASE,
             hardcap: PHASE_5_MAX_PURCHASE,
         },
+        Phase {
+            phase_number: 6,
+            amount: PHASE_6_ALLOCATION,
+            price: PHASE_6_PRICE,
+            percentage: PHASE_6_PERCENTAGE,
+            tokens_sold: 0,
+            tokens_available: PHASE_6_ALLOCATION,
+            status: PhaseStatus::Upcoming,
+            softcap: PHASE_6_MIN_PURCHASE,
+            hardcap: PHASE_6_MAX_PURCHASE,
+        },
     ];
 
     // Initialize presale info

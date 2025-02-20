@@ -1,9 +1,9 @@
 {
-    "name": "DevDots",
-    "symbol": "DDT",
-    "description": "DevDots Token",
-    "image": "https://image.url",
-    "external_url": "https://devdots.org",
+    "name": "Nervous",
+    "symbol": "NERV",
+    "description": " is the first memecoin that fully embraces the anxiety, chaos, and excitement of crypto trading. Designed for traders who know the thrill of watching charts, the panic of gas fees, and the euphoria of a bull run,  brings humor and relatability to the meme economy",
+    "image": "https://gateway.pinata.cloud/ipfs/QmdMuTmqpkqZKSsL7LwVVPGCj83S4Xg6b1FNt5ugRXW6Vs",
+    "external_url": "https://nervecoin.vip",
     "attributes": [
         {
             "trait_type": "Category",
@@ -11,27 +11,23 @@
         },
         {
             "trait_type": "Website",
-            "value": "https://devdots.org"
+            "value": "https://nervecoin.vip"
         },
         {
             "trait_type": "Twitter",
-            "value": "https://twitter.com/devdots"
+            "value": "https://x.com/nervetoken1"
         },
         {
             "trait_type": "Telegram",
-            "value": "https://t.me/devdots"
+            "value": "https://t.me/nervetoken1"
         },
         {
             "trait_type": "Discord",
-            "value": "https://discord.gg/devdots"
-        },
-        {
-            "trait_type": "GitHub",
-            "value": "https://github.com/devdots"
+            "value": "https://discord.gg/nervetoken1"
         },
         {
             "trait_type": "Total Supply",
-            "value": "1,000,000"
+            "value": "1,000,000,000"
         },
         {
             "trait_type": "Decimals",
@@ -41,14 +37,14 @@
     "properties": {
         "files": [
             {
-                "uri": "https://image.url",
+                "uri": "https://gateway.pinata.cloud/ipfs/QmdMuTmqpkqZKSsL7LwVVPGCj83S4Xg6b1FNt5ugRXW6Vs",
                 "type": "image/png"
             }
         ],
         "category": "image",
         "creators": [
             {
-                "address": "<your-wallet-address>",
+                "address": "12d5by8To4Uy8FoQCosAsT7V4Hz1JwDHh2Atpmod2g9X",
                 "share": 100
             }
         ]

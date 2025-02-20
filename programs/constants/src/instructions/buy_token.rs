@@ -66,9 +66,9 @@ pub fn buy_token(ctx: Context<BuyToken>, amount: u64) -> Result<()> {
     if user_info.wallet == Pubkey::default() {
         user_info.wallet = ctx.accounts.buyer.key();
         user_info.tokens_bought = 0;
-        user_info.phase_purchases = [0; 5];
+        user_info.phase_purchases = [0; 6];
         user_info.last_purchase_time = 0;
-        user_info.phase_claims = [false; 5];  // Initialize all phases as unclaimed
+        user_info.phase_claims = [false; 6];  // Initialize all phases as unclaimed
         user_info.total_paid = 0;
     }
 

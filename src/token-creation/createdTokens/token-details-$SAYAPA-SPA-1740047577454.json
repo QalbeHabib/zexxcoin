@@ -1,0 +1,23 @@
+{
+  "tokenName": "$SAYAPA",
+  "tokenSymbol": "SPA",
+  "timestamp": "2025-02-20T10:32:57.454Z",
+  "payerPublicKey": "12d5by8To4Uy8FoQCosAsT7V4Hz1JwDHh2Atpmod2g9X",
+  "mintKeypair": {
+    "publicKey": "41u7EEBN8u3CZbP275zxoMBxURpGbdHUp4vUsSfj5EQy",
+    "secretKey": "3ibwWhgN572wbCSDDjCZIzmRsWHKKhTrvj5sNlC7RssszfqRcPyLWIobYbl+RPbd/hhBlb7EinVpGAFK4bktgg=="
+  },
+  "tokenMint": "41u7EEBN8u3CZbP275zxoMBxURpGbdHUp4vUsSfj5EQy",
+  "tokenAccount": "5fDveuwGTGYHKbj9PabJDeVttbtozxY9zdiahmTkpvCx",
+  "metadataAccount": "BkkB2fUoQA2o91WyBMqs7LgUzmdAzJf36Mho3y4y3j7Q",
+  "metadataUri": "https://gateway.pinata.cloud/ipfs/QmRyeAFuBBewezkZhucubKLxTG8UNHwvAX6YCWsc47uy5Y",
+  "totalSupply": "1000000000 NERVE",
+  "mintAuthorityRevoked": true,
+  "freezeAuthorityRevoked": true,
+  "transactionSignatures": {
+    "mint": "6kJTxk5x8tbSsoMv9bHNwY6WftM7odeKwb6bg8bUQWJKZfKBpCgqH4JAokEQHVTSuHvz7chmPp1keWxDqfX7PwY",
+    "metadata": "5QoseYeYtrV2R2AuceigeqoZEYoNYhM7SbGyh9wY6pGnxuxDEQNc141E3EZfYvy5EpC68vH9VTZ5F4fLa9NomWM5",
+    "revokeMintAuthority": "3CxtJirL6iFn2Vz4Fge73wP9r6MLa5rsJVUKPN3zf6LDjJiETDNzGh8kgicTShJjTFDk2WPv8VHHMZ8HoEG6s8de",
+    "revokeFreezeAuthority": "2QEkAhED9qarXTg7wEm3kVpnwANzXDgEsUdpYL5dzHtta236jUizCJN1MvjEmVYZgGQYTvuHN7PasvG1UxAfGgTP"
+  }
+}

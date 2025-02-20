@@ -7,11 +7,11 @@ pub struct UserInfo {
     // Total tokens bought by the user across all phases
     pub tokens_bought: u64,
     // Array of tokens bought in each phase [phase1_amount, phase2_amount, ...]
-    pub phase_purchases: [u64; 5],
+    pub phase_purchases: [u64; 6],
     // Last purchase timestamp
     pub last_purchase_time: i64,
     // Array to track which phases have been claimed [phase1_claimed, phase2_claimed, ...]
-    pub phase_claims: [bool; 5],
+    pub phase_claims: [bool; 6],
     // The wallet address of the user
     pub wallet: Pubkey,
     // Total amount paid in lamports
@@ -20,7 +20,7 @@ pub struct UserInfo {
 
 impl UserInfo {
     pub fn record_purchase(&mut self, phase: u8, amount: u64, payment_amount: u64) -> Result<()> {
-        require!(phase > 0 && phase <= 5, PresaleError::InvalidPhase);
+        require!(phase > 0 && phase <= 6, PresaleError::InvalidPhase);
         
         self.phase_purchases[(phase - 1) as usize] = self.phase_purchases[(phase - 1) as usize]
             .checked_add(amount)
@@ -40,7 +40,7 @@ impl UserInfo {
     }
 
     pub fn get_phase_amount(&self, phase: u8) -> Option<u64> {
-        if phase == 0 || phase > 5 {
+        if phase == 0 || phase > 6 {
             None
         } else {
             Some(self.phase_purchases[(phase - 1) as usize])

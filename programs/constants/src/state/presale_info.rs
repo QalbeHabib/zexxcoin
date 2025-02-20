@@ -12,10 +12,10 @@ pub struct PresaleInfo {
     pub total_token_supply: u64,
     // Remaining tokens to be sold across all phases
     pub remaining_tokens: u64,
-    // Current active phase (1-5)
+    // Current active phase (1-6)
     pub current_phase: u8,
     // Array of phase information
-    pub phases: [Phase; 5],
+    pub phases: [Phase; 6],
     // Total amount of presale tokens sold during the presale
     pub total_tokens_sold: u64,
     // Total amount of tokens deposited by admin
@@ -37,7 +37,7 @@ pub struct PresaleInfo {
 }
 
 impl PresaleInfo {
-    pub const TOTAL_PHASES: usize = 5;
+    pub const TOTAL_PHASES: usize = 6;
     pub const TOTAL_SUPPLY: u64 = TOTAL_SUPPLY;
 
     pub fn get_current_phase(&self) -> Option<&Phase> {
