@@ -1,0 +1,23 @@
+{
+  "tokenName": "$DEVDEAD",
+  "tokenSymbol": "DDT",
+  "timestamp": "2025-02-21T09:05:55.818Z",
+  "payerPublicKey": "12d5by8To4Uy8FoQCosAsT7V4Hz1JwDHh2Atpmod2g9X",
+  "mintKeypair": {
+    "publicKey": "C7k7eU6sMSHAGk2mAiDJxMUp1WzebjGm6DiEy8UucLEN",
+    "secretKey": "5HPIcWbNVAMPvcuktVgVoqxvecla5LrObFatposOLZSlKsp18JoOzQ1+HkyDdoVbJ48K1F06bXeR6V58lv4mCw=="
+  },
+  "tokenMint": "C7k7eU6sMSHAGk2mAiDJxMUp1WzebjGm6DiEy8UucLEN",
+  "tokenAccount": "DFLbhPnnZptnbfTrHbJHM4FxgKqcyxzacFhiC2cdRZZr",
+  "metadataAccount": "AjycWsiGdPfxVPY2RsjMb4mpkBDFkU8WrWtQDS2hwdPU",
+  "metadataUri": "https://gateway.pinata.cloud/ipfs/QmZxM5i8N1iho2jTuEDBhsssNpPKrniv6dVJxmW653sKyF",
+  "totalSupply": "1000000000 DDT",
+  "mintAuthorityRevoked": true,
+  "freezeAuthorityRevoked": true,
+  "transactionSignatures": {
+    "mint": "4xNBPqTB4kGvEZ2KGMZwHh94svKS1nhLBmSLepHQ2eEd9wAsdZ1nNTPLp6ji36pKLLJ2Y3QjvCjvr3RieNGuBXDo",
+    "metadata": "4yj7AHUcJKYAb7SEL9CwwMiSLGQjNUXTfB9uMYpyTS79ma4GVaPvDvErmWVfquohZmja6as2XzFLLDFuAgLT1ViM",
+    "revokeMintAuthority": "GVQ9M5mbbyKkivsaKb5CsfYe5nfUBDV6vv1PhJDiNKzBsEPwPJqQzGHFWeFgHiKeSF2eVZjGopovzbgKNsK1Bv3",
+    "revokeFreezeAuthority": "5UQaYHPYrHkZzVxE5o9dhxNE2RJ67Ysm4zMqvQNZ7Xi3z8qE26pQihJSNdiptD33JJQNoH4f2QoESNKJa6ai1x2c"
+  }
+}

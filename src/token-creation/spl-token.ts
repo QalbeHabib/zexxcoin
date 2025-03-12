@@ -216,15 +216,15 @@ async function createTokenForLiquidity(): Promise<TokenCreationResult> {
     // Step 8: Prepare and upload metadata to Pinata
     console.log("Preparing and uploading metadata to Pinata...");
     const metadata: TokenMetadata = {
-      name: "$SAYAPA",
-      symbol: "SPA",
+      name: "$DEVDEAD",
+      symbol: "DDT",
       description:
-        "$SAYAPA is the first memecoin that fully embraces the anxiety, chaos, and excitement of crypto trading.",
+        "$DEVDEAD is the first memecoin that fully embraces the anxiety, chaos, and excitement of crypto trading.",
       image: imageUri,
       decimals: 9,
       attributes: [
-        { trait_type: "Creator", value: "Sayapa Community" },
-        { trait_type: "Website", value: "https://www.sayapa.vip/" },
+        { trait_type: "Creator", value: "DevDead Community" },
+        { trait_type: "Website", value: "https://www.devdead.vip/" },
       ],
       properties: {
         files: [
@@ -236,7 +236,7 @@ async function createTokenForLiquidity(): Promise<TokenCreationResult> {
         category: "image",
         creators: [{ address: payer.publicKey.toString(), share: 100 }],
       },
-      external_url: "https://www.sayapa.vip/",
+      external_url: "https://www.devdead.vip/",
     };
 
     const metadataUri: string = await uploadMetadataToPinata(metadata);
