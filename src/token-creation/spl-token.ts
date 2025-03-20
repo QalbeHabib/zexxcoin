@@ -225,6 +225,8 @@ async function createTokenForLiquidity(): Promise<TokenCreationResult> {
       attributes: [
         { trait_type: "Creator", value: "DevDead Community" },
         { trait_type: "Website", value: "https://www.devdead.vip/" },
+        { trait_type: "Twitter", value: "https://x.com/devdead_vip" },
+        { trait_type: "Telegram", value: "https://t.me/devdead_vip" },
       ],
       properties: {
         files: [
