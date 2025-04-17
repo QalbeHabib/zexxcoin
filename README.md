@@ -1,7 +1,7 @@
-# Quant Coin Presale Program
+# Zexx Coin Presale Program
 
 A Solana program for managing a multi-phase token presale with advanced features and safety mechanisms.
-Front-End integration and UI are available in my Private repo, just drop a LinkedIn message to me, I'll give it to you.
+Front-end integration and UI are available in my Private repo. Just drop me a LinkedIn message, and I'll give it to you.
 
 ## Overview
 
